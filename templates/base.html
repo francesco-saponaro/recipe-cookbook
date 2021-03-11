@@ -19,12 +19,14 @@
                 <a href="{{ url_for('get_recipes') }}" class="brand-logo">Recipe <span class="vegan-color">Cookbook</span></a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
-                    <li><a href="mobile.html">Profile</a></li>
-                    <li><a href="badges.html">Search</a></li>
                     <li><a href="collapsible.html">Dashboard</a></li>
-                    <li><a href="mobile.html">Log in</a></li>
+                    {% if session.user_session %}
+                        <li><a href="mobile.html">Profile</a></li>
+                        <li><a href="mobile.html">Log Out</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('login') }}">Log in</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>
-                    <li><a href="mobile.html">Log Out</a></li>
+                    {% endif %}
                 </ul>
                 <!-- Dropdown Trigger -->
                 <a class='dropdown-trigger btn nav-btn right hide-on-med-and-down' href='#' data-target='dropdown1'>Quick search</a>
@@ -44,7 +46,6 @@
         <ul class="sidenav" id="mobile-demo">
             <li><h4 class="center-align">Recipe <span class="vegan-color">Cookbook</span></h4></li>
             <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
-            <li><a href="mobile.html">Profile</a></li>
             <li><a href="badges.html">Starters</a></li>
             <li><a href="collapsible.html">Brunch</a></li>
             <li><a href="mobile.html">Lunch</a></li>
@@ -53,14 +54,32 @@
             <li><a href="mobile.html"><span class="vegan-color">Vegan</span></a></li>
             <li><a href="mobile.html">By country</a></li>
             <li><a href="mobile.html">Dashboard</a></li>
-            <li><a href="mobile.html">Log in</a></li>
-            <li><a href="{{ url_for('register') }}">Register</a></li>
-            <li><a href="mobile.html">Log Out</a></li>
+            {% if session.user_session %}
+                <li><a href="mobile.html">Profile</a></li>
+                <li><a href="mobile.html">Log Out</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Log in</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
         </ul>
     </header>
 
-    {% block content %} 
-    {% endblock %}
+    <section>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="row center-align">
+                        <h4 class="light-green-text text-darken-2">{{ message }}</h4>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </section>
+
+    <main class="container">
+        {% block content %} 
+        {% endblock %}
+    </main>
   
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
