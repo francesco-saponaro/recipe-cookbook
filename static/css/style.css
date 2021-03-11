@@ -1,0 +1,35 @@
+/* Navbar */
+nav .brand-logo, .dropdown-content li a, nav ul a {
+    color:#3d3d3d;
+}
+
+nav .nav-wrapper {
+    padding: 0 15px;
+}
+
+.nav-btn {
+    margin-top:13px;
+    background-color: #689f38;
+}
+
+.nav-btn:hover {
+    background-color: #33691e;
+}
+
+.nav-btn:focus {
+    background-color: #689f38;
+}
+
+/* Colors */
+.vegan-color {
+    color: #689f38;
+}
+
+/* register form */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active
+{
+ -webkit-box-shadow: 0 0 0 30px #ffea00 inset !important;
+}
