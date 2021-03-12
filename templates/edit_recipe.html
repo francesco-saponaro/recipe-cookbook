@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <h3 class="recipe-title center-align">Edit Recipe</h3>
+
+    <div class="form-container row yellow accent-4">
+        <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}">
+            <div class="row">
+                <div class="input-field col s12">
+                <input id="recipe_name" name="recipe_name" type="text" class="validate" required>
+                <label for="recipe_name">Recipe Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m4">
+                    <select id="meal_types" name="meal_types" class="validate" required>
+                        <option value="" disabled selected>Meal type</option>
+                        {% for meal_type in meal_types %}
+                            <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s12 m4">
+                    <select id="difficulties" name="difficulties" class="validate" required>
+                        <option value="" disabled selected>Difficulty</option>
+                        {% for difficulty in difficulties %}
+                            <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s12 m4">
+                    <select id="prep_times" name="prep_times" class="validate" required>
+                        <option value="" disabled selected>Prep time</option>
+                        {% for prep_time in prep_times %}
+                            <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m4">
+                    <select id="calories" name="calories" class="validate" required>
+                        <option value="" disabled selected>Calories</option>
+                        {% for calorie_amount in calories %}
+                            <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s12 m4">
+                    <select id="dietary_requirements" name="dietary_requirements" class="validate" required multiple>
+                        <option value="" disabled selected>Dietary requirements</option>
+                        {% for dietary_requirement in dietary_requirements %}
+                            <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s12 m4">
+                    <select id="allergens" name="allergens" class="validate" required multiple>
+                        <option value="" disabled selected>Allergens</option>
+                        {% for allergen in allergens %}
+                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m4">
+                    <input id="countries" name="countries" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The country name can only contain alphabetic characters" required>
+                    <label for="countries">Country</label>
+                </div>
+                <div class="input-field col s12 m4">
+                    <select id="servings" name="servings" class="validate" required>
+                        <option value="" disabled selected>Serving</option>
+                        {% for serving in servings %}
+                            <option value="{{ serving.serving }}">{{ serving.serving }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s12 m4">
+                    <p>
+                    <label>
+                        <input type="checkbox" id="is_high_protein" name="is_high_protein" />
+                        <span class="checkbox-color">High protein</span>
+                    </label>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <h5>Ingredients:</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m3">
+                    <input id="ingredient" name="ingredient" type="text" class="validate" required>
+                    <label for="ingredient">Name</label>
+                </div>
+                <div class="input-field col s12 m3">
+                    <input id="ingredient_quantity" name="ingredient_quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
+                    <label for="ingredient_quantity">Quantity</label>
+                </div>
+                <div class="input-field col s12 m3">
+                    <select id="units" name="units" class="validate" required>
+                        <option value="" disabled selected>Unit</option>
+                        {% for unit in units %}
+                            <option value="{{ unit.unit }}">{{ unit.unit }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-field col s6 m1">
+                    <a class="btn-floating btn-large waves-effect waves-light light-green darken-2 right"><i class="fas fa-plus"></i></a>
+                 </div>
+                 <div class="input-field col s6 m1">
+                    <a class="btn-floating btn-large waves-effect waves-light red"><i class="fas fa-times right"></i></a>
+                 </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <h5>Method:</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                <textarea id="description" name="description" class="materialize-textarea" required></textarea>
+                <label for="description">Describe the preparation</label>
+                </div>
+            </div>
+            <button class="add-recipe-btn btn waves-effect waves-light light-green darken-2" type="submit">Edit recipe
+                <i class="fas fa-plus-square"></i>
+            </button>
+        </form>
+    </div>
+   
+    
+{% endblock %}

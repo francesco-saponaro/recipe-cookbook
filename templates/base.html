@@ -13,7 +13,7 @@
 <body>
 
     <header>
-        <nav class="yellow accent-3">
+        <nav class="yellow accent-4">
             <div class="nav-wrapper">
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="fas fa-bars"></i></a>
                 <a href="{{ url_for('get_recipes') }}" class="brand-logo">Recipe <span class="vegan-color">Cookbook</span></a>
@@ -21,8 +21,8 @@
                     <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
                     <li><a href="collapsible.html">Dashboard</a></li>
                     {% if session.user_session %}
-                        <li><a href="mobile.html">Profile</a></li>
-                        <li><a href="mobile.html">Log Out</a></li>
+                        <li><a href="{{ url_for('profile', username=session['user_session']) }}">Profile</a></li>
+                        <li><a href="{{ url_for('logout') }}">Log Out</a></li>
                     {% else %}
                     <li><a href="{{ url_for('login') }}">Log in</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>
@@ -55,8 +55,8 @@
             <li><a href="mobile.html">By country</a></li>
             <li><a href="mobile.html">Dashboard</a></li>
             {% if session.user_session %}
-                <li><a href="mobile.html">Profile</a></li>
-                <li><a href="mobile.html">Log Out</a></li>
+                <li><a href="{{ url_for('profile', username=session['user_session']) }}">Profile</a></li>
+                <li><a href="{{ url_for('logout') }}">Log Out</a></li>
             {% else %}
                 <li><a href="{{ url_for('login') }}">Log in</a></li>
                 <li><a href="{{ url_for('register') }}">Register</a></li>

@@ -1,3 +1,8 @@
+body {
+    color: #3d3d3d;
+    background-color: #fff ;
+}
+
 /* Navbar */
 nav .brand-logo, .dropdown-content li a, nav ul a {
     color:#3d3d3d;
@@ -31,5 +36,56 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus, 
 input:-webkit-autofill:active
 {
- -webkit-box-shadow: 0 0 0 30px #ffea00 inset !important;
+ -webkit-box-shadow: 0 0 0 30px #ffd600 inset !important;
+}
+
+/* home page*/
+.add-filter-btn {
+    color:#3d3d3d;
+    border-radius:35px;
+    margin-top:50px;
+    width: 150px;
+    text-transform:capitalize;
+}
+
+.filter-btn {
+    float:right;
+}
+
+.home-header {
+    margin-top:0;
+}
+
+.card-panel {
+    padding:12px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.recipes-title {
+    font-size:20px;
+}
+
+/* add recipe page*/
+.recipe-title {
+    margin: 1.9466666667rem 0;
+}
+
+.form-container {
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.input-field>label {
+    color: #000000;
+}
+
+.checkbox-color {
+     color: #000000;
+}
+
+.add-recipe-btn {
+    width:100%;
+    height:55px;
 }
