@@ -7,80 +7,120 @@
         <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}">
             <div class="row">
                 <div class="input-field col s12">
-                <input id="recipe_name" name="recipe_name" type="text" class="validate" required>
+                <input id="recipe_name" value="{{ recipe.recipe_name }}"name="recipe_name" type="text" class="validate" required>
                 <label for="recipe_name">Recipe Name</label>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12 m4">
                     <select id="meal_types" name="meal_types" class="validate" required>
-                        <option value="" disabled selected>Meal type</option>
+                        <option value="" disabled>Meal type</option>
                         {% for meal_type in meal_types %}
-                            <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
+                            {% if meal_type.meal_type == recipe.meal_type %}
+                                <option value="{{ meal_type.meal_type }}" selected>{{ meal_type.meal_type }}</option>
+                            {% else %}
+                                <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="meal_types">Meal type</label>
                 </div>
                 <div class="input-field col s12 m4">
                     <select id="difficulties" name="difficulties" class="validate" required>
-                        <option value="" disabled selected>Difficulty</option>
+                        <option value="" disabled>Difficulty</option>
                         {% for difficulty in difficulties %}
-                            <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
+                            {% if difficulty.difficulty  == recipe.difficulty %}
+                                <option value="{{ difficulty.difficulty }}" selected>{{ difficulty.difficulty }}</option>
+                            {% else %}
+                                <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="difficulties">Difficulty</label>
                 </div>
                 <div class="input-field col s12 m4">
                     <select id="prep_times" name="prep_times" class="validate" required>
-                        <option value="" disabled selected>Prep time</option>
+                        <option value="" disabled>Prep time</option>
                         {% for prep_time in prep_times %}
-                            <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
+                            {% if prep_time.prep_time == recipe.prep_time %}
+                                <option value="{{ prep_time.prep_time }}" selected>{{ prep_time.prep_time }}</option>
+                            {% else %}
+                                <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="prep_times">Prep time</label>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12 m4">
                     <select id="calories" name="calories" class="validate" required>
-                        <option value="" disabled selected>Calories</option>
+                        <option value="" disabled>Calories</option>
                         {% for calorie_amount in calories %}
-                            <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
+                            {% if calorie_amount.calorie_amount == recipe.calorie_amount %}
+                                <option value="{{ calorie_amount.calorie_amount }}" selected>{{ calorie_amount.calorie_amount }}</option>
+                            {% else %}
+                                <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="calories">Calories</label>
                 </div>
                 <div class="input-field col s12 m4">
                     <select id="dietary_requirements" name="dietary_requirements" class="validate" required multiple>
-                        <option value="" disabled selected>Dietary requirements</option>
+                        <option value="" disabled>Dietary requirements</option>
                         {% for dietary_requirement in dietary_requirements %}
-                            <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
+                            {% if dietary_requirement.dietary_requirement in recipe.dietary_requirement %}
+                                <option value="{{ dietary_requirement.dietary_requirement }}" selected>{{ dietary_requirement.dietary_requirement }}</option>
+                            {% else %}
+                                <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="dietary_requirements">Dietary requirements</label>
                 </div>
                 <div class="input-field col s12 m4">
                     <select id="allergens" name="allergens" class="validate" required multiple>
-                        <option value="" disabled selected>Allergens</option>
+                        <option value="" disabled>Allergens</option>
                         {% for allergen in allergens %}
-                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
+                            {% if allergen.allergen in recipe.allergen %}
+                                <option value="{{ allergen.allergen }}" selected>{{ allergen.allergen }}</option>
+                            {% else %}
+                                <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="allergens">Allergens</label>
                 </div>
             </div>
             <div class="row">
                 <div class="input-field col s12 m4">
-                    <input id="countries" name="countries" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The country name can only contain alphabetic characters" required>
+                    <input id="countries" value="{{ recipe.country }}" name="countries" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The country name can only contain alphabetic characters" required>
                     <label for="countries">Country</label>
                 </div>
                 <div class="input-field col s12 m4">
                     <select id="servings" name="servings" class="validate" required>
-                        <option value="" disabled selected>Serving</option>
+                        <option value="" disabled>Serving</option>
                         {% for serving in servings %}
-                            <option value="{{ serving.serving }}">{{ serving.serving }}</option>
+                            {% if serving.serving == recipe.serving %}
+                                <option value="{{ serving.serving }}" selected>{{ serving.serving }}</option>
+                            {% else %}
+                                <option value="{{ serving.serving }}">{{ serving.serving }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="servings">Servings</label>
                 </div>
                 <div class="input-field col s12 m4">
                     <p>
                     <label>
-                        <input type="checkbox" id="is_high_protein" name="is_high_protein" />
-                        <span class="checkbox-color">High protein</span>
+                        {% if recipe.is_high_protein == "on" %}
+                            <input type="checkbox" id="is_high_protein" name="is_high_protein" checked />
+                            <span class="checkbox-color">High protein</span>
+                        {% else %}
+                            <input type="checkbox" id="is_high_protein" name="is_high_protein" />
+                            <span class="checkbox-color">High protein</span>
+                        {% endif %}
                     </label>
                     </p>
                 </div>
@@ -92,20 +132,25 @@
             </div>
             <div class="row">
                 <div class="input-field col s12 m3">
-                    <input id="ingredient" name="ingredient" type="text" class="validate" required>
+                    <input id="ingredient" value="{{ recipe.ingredient }}" name="ingredient" type="text" class="validate" required>
                     <label for="ingredient">Name</label>
                 </div>
                 <div class="input-field col s12 m3">
-                    <input id="ingredient_quantity" name="ingredient_quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
+                    <input id="ingredient_quantity" value="{{ recipe.ingredient_quantity }}" name="ingredient_quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
                     <label for="ingredient_quantity">Quantity</label>
                 </div>
                 <div class="input-field col s12 m3">
                     <select id="units" name="units" class="validate" required>
-                        <option value="" disabled selected>Unit</option>
+                        <option value="" disabled>Unit</option>
                         {% for unit in units %}
-                            <option value="{{ unit.unit }}">{{ unit.unit }}</option>
+                            {% if unit.unit == recipe.unit %}
+                                <option value="{{ unit.unit }}" selected>{{ unit.unit }}</option>
+                            {% else %}
+                                <option value="{{ unit.unit }}">{{ unit.unit }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
+                    <label for="units">Unit</label>
                 </div>
                 <div class="input-field col s6 m1">
                     <a class="btn-floating btn-large waves-effect waves-light light-green darken-2 right"><i class="fas fa-plus"></i></a>
@@ -121,13 +166,18 @@
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                <textarea id="description" name="description" class="materialize-textarea" required></textarea>
+                <textarea id="description" name="description" class="materialize-textarea" required>{{ recipe.description }}</textarea>
                 <label for="description">Describe the preparation</label>
                 </div>
             </div>
-            <button class="add-recipe-btn btn waves-effect waves-light light-green darken-2" type="submit">Edit recipe
-                <i class="fas fa-plus-square"></i>
-            </button>
+            <div class="row">
+                <div class="col s12 center-align">
+                    <a href="{{ url_for('get_recipes') }}" class="btn red waves-effect waves-light">Cancel</a>
+                    <button class="btn waves-effect waves-light light-green darken-2" type="submit">Edit recipe
+                        <i class="fas fa-plus-square"></i>
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
    

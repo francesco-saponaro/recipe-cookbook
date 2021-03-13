@@ -2,6 +2,7 @@
     $('.sidenav').sidenav();
     $('.dropdown-trigger').dropdown();
     $('select').formSelect();
+    $('.modal').modal();
   });
 
   validateMaterializeSelect();

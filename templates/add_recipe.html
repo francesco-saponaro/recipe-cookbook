@@ -16,6 +16,7 @@
                     <select id="meal_types" name="meal_types" class="validate" required>
                         <option value="" disabled selected>Meal type</option>
                         {% for meal_type in meal_types %}
+                            <!--the value is what will be sent to the server, the content is what is displayed-->
                             <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
                         {% endfor %}
                     </select>

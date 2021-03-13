@@ -1,20 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <a href="{{ url_for('add_recipe') }}"class="add-filter-btn waves-effect waves-light btn-large yellow accent-4">Add recipe</a>
-    <a class="add-filter-btn filter-btn waves-effect waves-light btn-large yellow accent-4">Filter</a>
+    <div class="row add-recipe-row">
+        <div class="col s12">
+            {% if session.user_session %}
+                <!--url_for will call the specified function's url which in turn will call the function-->
+                <a href="{{ url_for('add_recipe') }}"class="add-filter-btn waves-effect waves-light btn-large yellow accent-4">Add recipe</a>
+            {% endif %}
+            <a class="add-filter-btn filter-btn waves-effect waves-light btn-large yellow accent-4">Filter</a>
+        </div>
+    </div>
     <h3 class="center-align home-header">Recipes</h3>
     <h3>We will have the search card here</h3>
     {% for recipe in recipes %}
         <div class="row">
             <div class="col s12 m10 offset-m1">
-                <div class="card-panel yellow accent-4">
+                <div class="card-panel recipe-panel yellow accent-4">
                     <div class="col s6">
-                        <p><span class="recipe-title">{{ recipe.recipe_name }}</span> - <em>uploaded by:</em> {{ recipe.created_by }}</p>
+                        <p><span class="custom-margin">{{ recipe.recipe_name }}</span> - <em>uploaded by:</em> {{ recipe.created_by }}</p>
                     </div>
                     <div class="col s3">
-                        <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
-                        <a class="btn-small recipes-buttons red right">Delete</a>
+                        {% if session.user_session|lower == recipe.created_by|lower %}
+                            <!--this button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument  -->
+                            <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
+                            <!-- Delete confimation Modal Trigger -->
+                            <a class="red recipe-buttons btn-small modal-trigger" href="#modal1">Delete</a>
+
+                            <!-- Modal Structure -->
+                            <div id="modal1" class="modal yellow accent-4">
+                                <div class="modal-content">
+                                <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
+                                </div>
+                                <div class="modal-footer yellow accent-4">
+                                <a href="{{ url_for('get_recipes') }}" class="modal-close waves-effect waves-green btn-small red">Cancel</a>
+                                <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
