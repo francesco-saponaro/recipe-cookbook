@@ -6,12 +6,15 @@
     <div class="form-container row yellow accent-4">
         <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}">
             <div class="row">
+                <!--Recipe name-->
                 <div class="input-field col s12">
-                <input id="recipe_name" value="{{ recipe.recipe_name }}"name="recipe_name" type="text" class="validate" required>
-                <label for="recipe_name">Recipe Name</label>
+                    <input id="recipe_name" value="{{ recipe.recipe_name }}"name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z]{3,30}$" title="The recipe name can only contain alphabetic characters" required>
+                    <label for="recipe_name">Recipe Name</label>
                 </div>
             </div>
+
             <div class="row">
+                <!--Meal type-->
                 <div class="input-field col s12 m4">
                     <select id="meal_types" name="meal_types" class="validate" required>
                         <option value="" disabled>Meal type</option>
@@ -25,6 +28,7 @@
                     </select>
                     <label for="meal_types">Meal type</label>
                 </div>
+                <!--Difficulty-->
                 <div class="input-field col s12 m4">
                     <select id="difficulties" name="difficulties" class="validate" required>
                         <option value="" disabled>Difficulty</option>
@@ -38,6 +42,7 @@
                     </select>
                     <label for="difficulties">Difficulty</label>
                 </div>
+                <!--Prep time-->
                 <div class="input-field col s12 m4">
                     <select id="prep_times" name="prep_times" class="validate" required>
                         <option value="" disabled>Prep time</option>
@@ -52,7 +57,9 @@
                     <label for="prep_times">Prep time</label>
                 </div>
             </div>
+
             <div class="row">
+                <!--Calories-->
                 <div class="input-field col s12 m4">
                     <select id="calories" name="calories" class="validate" required>
                         <option value="" disabled>Calories</option>
@@ -66,6 +73,7 @@
                     </select>
                     <label for="calories">Calories</label>
                 </div>
+                <!--Dietary requirements-->
                 <div class="input-field col s12 m4">
                     <select id="dietary_requirements" name="dietary_requirements" class="validate" required multiple>
                         <option value="" disabled>Dietary requirements</option>
@@ -79,6 +87,7 @@
                     </select>
                     <label for="dietary_requirements">Dietary requirements</label>
                 </div>
+                <!--Allergens-->
                 <div class="input-field col s12 m4">
                     <select id="allergens" name="allergens" class="validate" required multiple>
                         <option value="" disabled>Allergens</option>
@@ -93,11 +102,14 @@
                     <label for="allergens">Allergens</label>
                 </div>
             </div>
+
             <div class="row">
+                <!--Country-->
                 <div class="input-field col s12 m4">
                     <input id="countries" value="{{ recipe.country }}" name="countries" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The country name can only contain alphabetic characters" required>
                     <label for="countries">Country</label>
                 </div>
+                <!--Servings-->
                 <div class="input-field col s12 m4">
                     <select id="servings" name="servings" class="validate" required>
                         <option value="" disabled>Serving</option>
@@ -111,6 +123,7 @@
                     </select>
                     <label for="servings">Servings</label>
                 </div>
+                <!--High protein checkbox-->
                 <div class="input-field col s12 m4">
                     <p>
                     <label>
@@ -125,20 +138,24 @@
                     </p>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col s12">
                     <h5>Ingredients:</h5>
                 </div>
             </div>
             <div class="row">
+                <!--Ingredient name-->
                 <div class="input-field col s12 m3">
-                    <input id="ingredient" value="{{ recipe.ingredient }}" name="ingredient" type="text" class="validate" required>
+                    <input id="ingredient" value="{{ recipe.ingredient }}" name="ingredient" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The ingredient name can only contain alphabetic characters" required>
                     <label for="ingredient">Name</label>
                 </div>
+                <!--Ingredient quantity-->
                 <div class="input-field col s12 m3">
                     <input id="ingredient_quantity" value="{{ recipe.ingredient_quantity }}" name="ingredient_quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
                     <label for="ingredient_quantity">Quantity</label>
                 </div>
+                <!--Ingredient unit-->
                 <div class="input-field col s12 m3">
                     <select id="units" name="units" class="validate" required>
                         <option value="" disabled>Unit</option>
@@ -152,6 +169,7 @@
                     </select>
                     <label for="units">Unit</label>
                 </div>
+                <!--Add and remove ingredient buttons-->
                 <div class="input-field col s6 m1">
                     <a class="btn-floating btn-large waves-effect waves-light light-green darken-2 right"><i class="fas fa-plus"></i></a>
                  </div>
@@ -159,17 +177,20 @@
                     <a class="btn-floating btn-large waves-effect waves-light red"><i class="fas fa-times right"></i></a>
                  </div>
             </div>
+
             <div class="row">
                 <div class="col s12">
                     <h5>Method:</h5>
                 </div>
             </div>
             <div class="row">
+                <!--Method-->
                 <div class="input-field col s12">
-                <textarea id="description" name="description" class="materialize-textarea" required>{{ recipe.description }}</textarea>
-                <label for="description">Describe the preparation</label>
+                <textarea id="description" name="description" class="materialize-textarea" minlength=50 title="The method description must be at least 50 characters long" required>{{ recipe.description }}</textarea>
+                <label for="description">Describe the method</label>
                 </div>
             </div>
+            
             <div class="row">
                 <div class="col s12 center-align">
                     <a href="{{ url_for('get_recipes') }}" class="btn red waves-effect waves-light">Cancel</a>

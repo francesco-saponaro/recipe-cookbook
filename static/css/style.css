@@ -1,3 +1,4 @@
+/* Custom properties */
 body {
     color: #3d3d3d;
     background-color: #fff ;
@@ -52,7 +53,7 @@ input:-webkit-autofill:active
 }
 
 /* home page*/
-.add-recipe-row {
+.add-filter-row {
     margin-bottom:0;
 }
 
