@@ -21,7 +21,8 @@ mongo = PyMongo(app)
 def get_recipes():
     # We grab the recipes from mongodb "recipes" collection to populate the page
     recipes = mongo.db.recipes.find()
-    return render_template("index.html", recipes=recipes)
+    ingredients = mongo.db.ingredients.find()
+    return render_template("index.html", recipes=recipes, ingredients=ingredients)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -103,6 +104,12 @@ def logout():
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
     if request.method == "POST":
+        # Create the nested ingredients dictionary to be inserted in the recipe dictionary
+        ingredientdict = {
+            "ingredient_name": request.form.get("ingredient_name"),
+            "quantity": request.form.get("quantity"),
+            "unit": request.form.get("unit")
+        }
         # Create the dictionary to be inserted in the mongodb "recipe" collection
         recipe = {
             # Grab all values through the form's "name" parameter
@@ -116,15 +123,14 @@ def add_recipe():
             "serving": request.form.get("servings"),
             "is_high_protein": request.form.get("is_high_protein"),
             "country": request.form.get("countries"),
-            "ingredient": request.form.get("ingredient"),
-            "ingredient_quantity": request.form.get("ingredient_quantity"),
-            "unit": request.form.get("units"),
+            "ingredient": ingredientdict,
             "description": request.form.get("description"),
             # Grab this value from user in session
             "created_by": session["user_session"]
         }
         # Grab ingredient from form and insert it (in lowercase) in the mongodb "ingredients" collection
-        mongo.db.ingredients.insert_one({"ingredient": request.form.get("ingredient").lower()})
+        mongo.db.ingredients.insert_one({"ingredient_name": request.form.get("ingredient_name").lower(),
+                                         "created_by": session["user_session"]})
         # Grab country from form and insert it (in lowercase) in the mongodb "countries" collection
         mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
         # Insert dictionary in in the mongodb "recipes" collection
@@ -149,6 +155,12 @@ def add_recipe():
 @app.route("/edit_recipe/<recipe_id>", methods=["GET", "POST"])
 def edit_recipe(recipe_id):
     if request.method == "POST":
+        # Create the nested ingredients dictionary to be inserted in the dictionary
+        ingredientdict = {
+            "ingredient_name": request.form.get("ingredient_name"),
+            "quantity": request.form.get("quantity"),
+            "unit": request.form.get("unit")
+        }
         # Create the dictionary to be inserted in the mongodb "recipe" collection
         submit = {
             # Grab all values through the form's "name" parameter
@@ -162,14 +174,17 @@ def edit_recipe(recipe_id):
             "serving": request.form.get("servings"),
             "is_high_protein": request.form.get("is_high_protein"),
             "country": request.form.get("countries"),
-            "ingredient": request.form.get("ingredient"),
-            "ingredient_quantity": request.form.get("ingredient_quantity"),
-            "unit": request.form.get("units"),
+            "ingredient": ingredientdict,
             "description": request.form.get("description"),
             # Grab this value from logged in user
             "created_by": session["user_session"]
 
         }
+        # Grab ingredient from form and insert it (in lowercase) in the mongodb "ingredients" collection
+        mongo.db.ingredients.insert_one({"ingredient_name": request.form.get("ingredient_name").lower(),
+                                         "created_by": session["user_session"]})
+        # Grab country from form and insert it (in lowercase) in the mongodb "countries" collection
+        mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
         # Update dictionary in mongodb database. "update" method takes two parameters, first is the dictionary to be updated and the second is the updated dictionary. We find the dictionary to be updated through the recipe.id coming from the route
         mongo.db.recipes.update({"_id":ObjectId(recipe_id)}, submit)
         flash("Recipe successfully updated")
@@ -193,7 +208,18 @@ def edit_recipe(recipe_id):
 
 @app.route("/delete_recipe/<recipe_id>")
 def delete_recipe(recipe_id):
+   
+    # Grab the current recipe
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    # Remove deleted recipe ingredient from "ingredients" collection, but only if it was added by the user in session
+    ingredients = mongo.db.ingredients.find()
+    for ingredient in ingredients:
+        if ingredient["ingredient_name"] == recipe["ingredient"]["ingredient_name"]:
+            if ingredient["created_by"] == session["user_session"]:
+                mongo.db.ingredients.remove(ingredient)
+    
     mongo.db.recipes.remove({"_id":ObjectId(recipe_id)})
+
     flash("Task successfully deleted")
     return redirect(url_for("get_recipes"))
 

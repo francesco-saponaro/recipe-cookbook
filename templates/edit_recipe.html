@@ -147,20 +147,20 @@
             <div class="row">
                 <!--Ingredient name-->
                 <div class="input-field col s12 m3">
-                    <input id="ingredient" value="{{ recipe.ingredient }}" name="ingredient" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The ingredient name can only contain alphabetic characters" required>
+                    <input id="ingredient_name" value="{{ recipe.ingredient.ingredient_name }}" name="ingredient_name" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The ingredient name can only contain alphabetic characters" required>
                     <label for="ingredient">Name</label>
                 </div>
                 <!--Ingredient quantity-->
                 <div class="input-field col s12 m3">
-                    <input id="ingredient_quantity" value="{{ recipe.ingredient_quantity }}" name="ingredient_quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
-                    <label for="ingredient_quantity">Quantity</label>
+                    <input id="quantity" value="{{ recipe.ingredient.quantity }}" name="quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
+                    <label for="quantity">Quantity</label>
                 </div>
                 <!--Ingredient unit-->
                 <div class="input-field col s12 m3">
-                    <select id="units" name="units" class="validate" required>
+                    <select id="unit" name="unit" class="validate" required>
                         <option value="" disabled>Unit</option>
                         {% for unit in units %}
-                            {% if unit.unit == recipe.unit %}
+                            {% if unit.unit == recipe.ingredient.unit %}
                                 <option value="{{ unit.unit }}" selected>{{ unit.unit }}</option>
                             {% else %}
                                 <option value="{{ unit.unit }}">{{ unit.unit }}</option>

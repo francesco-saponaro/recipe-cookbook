@@ -108,17 +108,17 @@
             <div class="row">
                 <!--Ingredient name-->
                 <div class="input-field col s12 m3">
-                    <input id="ingredient" name="ingredient" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The ingredient name can only contain alphabetic characters" required>
-                    <label for="ingredient">Name</label>
+                    <input id="ingredient_name" name="ingredient_name" type="text" class="validate" pattern="^[a-zA-Z]+$" title="The ingredient name can only contain alphabetic characters" required>
+                    <label for="ingredient_name">Name</label>
                 </div>
                 <!--Ingredient quantity-->
                 <div class="input-field col s12 m3">
-                    <input id="ingredient_quantity" name="ingredient_quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
-                    <label for="ingredient_quantity">Quantity</label>
+                    <input id="quantity" name="quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
+                    <label for="quantity">Quantity</label>
                 </div>
                 <!--Ingredient unit-->
                 <div class="input-field col s12 m3">
-                    <select id="units" name="units" class="validate" required>
+                    <select id="unit" name="unit" class="validate" required>
                         <option value="" disabled selected>Unit</option>
                         {% for unit in units %}
                             <option value="{{ unit.unit }}">{{ unit.unit }}</option>
