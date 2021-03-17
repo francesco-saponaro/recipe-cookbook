@@ -98,6 +98,10 @@ input:-webkit-autofill:active
     color: #000000;
 }
 
+[type="checkbox"]+span:not(.lever):before, [type="checkbox"]:not(.filled-in)+span:not(.lever):after {
+    border: 2px solid #000000;
+}
+
 .checkbox-color {
      color: #000000;
 }
@@ -105,4 +109,30 @@ input:-webkit-autofill:active
 .add-recipe-btn {
     width:100%;
     height:55px;
+}
+
+.unit-select {
+    background-color: #ffd600;
+    border: 1px solid #ffd600;
+    border-bottom: 1px solid #9e9e9e;
+}
+
+.unit-select:focus {
+    outline: 1px solid #ffd600;
+}
+
+label > span {
+    color:#000000;
+}
+
+[type="radio"]:not(:checked)+span:before, [type="radio"]:not(:checked)+span:after {
+    border: 2px solid #9e9e9e;
+}
+
+[type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:after {
+    background-color: #000000;
+}
+
+[type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:before, [type="radio"].with-gap:checked+span:after {
+    border: 2px solid #000000;
 }
