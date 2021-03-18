@@ -16,6 +16,15 @@ h4 {
     margin: 1.9466666667rem 0;
 }
 
+/* Colors */
+.vegan-color {
+    color: #689f38;
+}
+
+.black-color {
+    color:#000000
+}
+
 /* Navbar */
 nav .brand-logo, .dropdown-content li a, nav ul a {
     color:#3d3d3d;
@@ -38,12 +47,7 @@ nav .nav-wrapper {
     background-color: #689f38;
 }
 
-/* Colors */
-.vegan-color {
-    color: #689f38;
-}
-
-/* register form */
+/* Register form */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
@@ -52,7 +56,7 @@ input:-webkit-autofill:active
  -webkit-box-shadow: 0 0 0 30px #ffd600 inset !important;
 }
 
-/* home page*/
+/* Home page*/
 .add-filter-row {
     margin-bottom:0;
 }
@@ -73,6 +77,7 @@ input:-webkit-autofill:active
     margin-top:0;
 }
 
+/* Recipe panel */
 .recipe-panel {
     padding:12px 24px;
     display: flex;
@@ -82,6 +87,11 @@ input:-webkit-autofill:active
 
 .recipes-title {
     font-size:20px;
+}
+
+.vg-icon{
+    color:#64dd17;
+    padding-left: 5px;
 }
 
 .modal .modal-content {
@@ -102,10 +112,6 @@ input:-webkit-autofill:active
     border: 2px solid #000000;
 }
 
-.checkbox-color {
-     color: #000000;
-}
-
 .add-recipe-btn {
     width:100%;
     height:55px;
@@ -115,6 +121,7 @@ input:-webkit-autofill:active
     background-color: #ffd600;
     border: 1px solid #ffd600;
     border-bottom: 1px solid #9e9e9e;
+    padding-left:0;
 }
 
 .unit-select:focus {
@@ -136,3 +143,8 @@ label > span {
 [type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:before, [type="radio"].with-gap:checked+span:after {
     border: 2px solid #000000;
 }
+
+[type="file"] {
+    margin-bottom:25px;
+}
+

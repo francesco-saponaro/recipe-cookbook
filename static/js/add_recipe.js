@@ -1,9 +1,15 @@
-let ingredientRows = document.getElementById("ingredients-container");
+let ingredientsContainer = document.getElementById("ingredients-container");
 
+//Remove ingredient row function
 function removeIng() {
-    ingredientRows.removeChild(ingredientRows.lastChild);
+    //Remove the last child in line unless its first child
+    //ingredientsContainer.childNodes actually has one extra text field. For that reason we need to increment the number in the condition of while loop.
+    if (ingredientsContainer.childNodes.length > 2) {
+        ingredientsContainer.removeChild(ingredientsContainer.lastChild);
+    }
 }
 
+//Add ingredient row function
 function addIng() {
     let newRow = document.createElement("div");
     newRow.className = "row";
@@ -36,9 +42,10 @@ function addIng() {
                 </select>
                 <label for="Unit"></label>`
 
+        //Append columns to row
         newRow.appendChild(newIngredient);
         newRow.appendChild(newQuantity);
         newRow.appendChild(newUnit);
-        ingredientRows.appendChild(newRow);
-
+        //Append row to container
+        ingredientsContainer.appendChild(newRow);
 }

@@ -4,7 +4,8 @@
     <h3 class="recipe-title center-align">Add Recipe</h3>
 
     <div class="form-container row yellow accent-4">
-        <form class="col s12" method="POST" action="{{ url_for('add_recipe') }}">
+                                                                             <!--Required to add and save files-->
+        <form class="col s12" method="POST" action="{{ url_for('add_recipe') }}" enctype="multipart/form-data">
             <div class="row">
                 <!--Recipe name-->
                 <div class="input-field col s12">
@@ -19,7 +20,7 @@
                     <select id="meal_types" name="meal_types" class="validate" required>
                         <option value="" disabled selected>Meal type</option>
                         {% for meal_type in meal_types %}
-                            <!--the value is what will be sent to the server, the content is what is displayed-->
+                            <!--The value is what will be sent to the server(Database), the content is what is displayed-->
                             <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
                         {% endfor %}
                     </select>
@@ -101,7 +102,7 @@
                     <p>
                     <label>
                         <input type="checkbox" id="is_high_protein" name="is_high_protein" />
-                        <span class="checkbox-color">High protein</span>
+                        <span class="black-color">High protein</span>
                     </label>
                     </p>
                 </div>
@@ -164,6 +165,15 @@
             </div>
 
             <div class="row">
+                <!--Recipe picture-->
+                <div class="col s12 center-align">
+                    <p class="black-color">Add a picture of your recipe dish (Optional)</p>
+                    <input class="center-align" type="file" name="recipe_image">
+                </div>
+            </div>
+
+            <div class="row">
+                <!--Submit button-->
                 <div class="col s12 center-align">
                     <button class="add-recipe-btn btn waves-effect waves-light light-green darken-2" type="submit">Add recipe <i class="fas fa-plus-square"></i>
                     </button>

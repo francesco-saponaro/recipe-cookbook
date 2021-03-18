@@ -122,6 +122,10 @@ def add_recipe():
                              }
             # Append all dictionaries to ingredients list, which in turn will be passed inside the recipe dictionary
             ingredients.append(ingredientdict)
+
+        if "recipe_image" in request.files:
+            recipe_image = request.files["recipe_image"]
+            mongo.save_file(recipe_image.filename, recipe_image)
         
         # Create the dictionary to be inserted in the mongodb "recipe" collection
         recipe = {
@@ -138,6 +142,7 @@ def add_recipe():
             "country": request.form.get("countries").lower(),
             "ingredient": ingredients,
             "description": request.form.get("description"),
+            "recipe_image_name": recipe_image.filename,
             # Grab this value from user in session
             "created_by": session["user_session"]
         }
@@ -247,6 +252,13 @@ def edit_recipe(recipe_id):
     countries = mongo.db.countries.find().sort("country", 1)
     servings = mongo.db.servings.find()
     return render_template("edit_recipe.html", recipe=recipe, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
+
+
+@app.route("/recipe_page/<recipe_id>")
+def recipe_page(recipe_id):
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    return render_template("recipe_page.html", recipe=recipe)
+
 
 
 @app.route("/delete_recipe/<recipe_id>")
