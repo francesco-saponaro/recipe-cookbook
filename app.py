@@ -252,18 +252,11 @@ def edit_recipe(recipe_id):
 @app.route("/delete_recipe/<recipe_id>")
 def delete_recipe(recipe_id):
    
-    # Grab the current recipe
+    # Grab the current recipe and remove it
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    # Remove deleted recipe ingredient from "ingredients" collection, but only if it was added by the user in session
-    ingredients = mongo.db.ingredients.find()
-    for ingredient in ingredients:
-        if ingredient["ingredient_name"] == recipe["ingredient"]["ingredient_name"]:#EXTRA ITERATION REQUIRED
-            if ingredient["created_by"] == session["user_session"]:
-                mongo.db.ingredients.remove(ingredient)
-    
-    mongo.db.recipes.remove({"_id":ObjectId(recipe_id)})
+    mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
 
-    flash("Task successfully deleted")
+    flash("Recipe successfully deleted")
     return redirect(url_for("get_recipes"))
 
 

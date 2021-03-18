@@ -29,9 +29,9 @@
                             <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
 
                             <!-- Delete confimation Modal Trigger -->
-                            <a class="red recipe-buttons btn-small modal-trigger" href="#modal1">Delete</a>
+                            <a class="red recipe-buttons btn-small modal-trigger" href="#modal{{ loop.index }}">Delete</a>
                             <!-- Modal Structure -->
-                            <div id="modal1" class="modal yellow accent-4">
+                            <div id="modal{{ loop.index }}" class="modal yellow accent-4">
                                 <div class="modal-content">
                                 <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
                                 </div>
