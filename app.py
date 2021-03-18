@@ -116,7 +116,7 @@ def add_recipe():
 
         # Iterate through the names list length and for each iteration create a dictionary containing the iteration of names, quantity and units
         for i in range(len(names)):
-            ingredientdict = { "ingredient_name": names[i],
+            ingredientdict = { "ingredient_name": names[i].lower(),
                                "quantity": quantities[i],
                                "unit": units[i]
                              }
@@ -141,13 +141,14 @@ def add_recipe():
             # Grab this value from user in session
             "created_by": session["user_session"]
         }
-        # Grab ingredients from form and insert it (in lowercase) in the mongodb "ingredients" collection
+
+        # Grab ingredients from form 
         ingredient_list = request.form.getlist("ingredient_name")
-        existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": request.form.get("ingredient_name").lower()})
+        # Loop through ingredients in form and for each, if not already in database, add them to it the ingredients collection
         for ingredient in ingredient_list:
+            existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": ingredient.lower()})
             if not existing_ingredient:
-                mongo.db.ingredients.insert_one({"ingredient_name": ingredient,
-                                             "created_by": session["user_session"]})
+                mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
         # Check if country already exist in database
         existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
@@ -188,7 +189,7 @@ def edit_recipe(recipe_id):
 
         # Iterate through the names list length and for each iteration create a dictionary containing the iteration of names, quantity and units
         for i in range(len(names)):
-            ingredientdict = { "ingredient_name": names[i],
+            ingredientdict = { "ingredient_name": names[i].lower(),
                                "quantity": quantities[i],
                                "unit": units[i]
                              }
@@ -213,13 +214,21 @@ def edit_recipe(recipe_id):
             # Grab this value from logged in user
             "created_by": session["user_session"]
         }
-        # Grab ingredient from form and insert it (in lowercase) in the mongodb "ingredients" collection
+
+        # Grab ingredients from form 
         ingredient_list = request.form.getlist("ingredient_name")
+        # Loop through ingredients in form and for each, if not already in database, add them to it the ingredients collection
         for ingredient in ingredient_list:
-            mongo.db.ingredients.insert_one({"ingredient_name": ingredient,
-                                             "created_by": session["user_session"]})
-        # Grab country from form and insert it (in lowercase) in the mongodb "countries" collection
-        mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
+            existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": ingredient.lower()})
+            if not existing_ingredient:
+                mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
+
+        # Check if country already exist in database
+        existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
+        # If country is not already in database, grab country from form and insert it (in lowercase) in the mongodb "countries" collection
+        if not existing_country:
+            mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
+
         # Update dictionary in mongodb database. "update" method takes two parameters, first is the dictionary to be updated and the second is the updated dictionary. We find the dictionary to be updated through the recipe.id coming from the route
         mongo.db.recipes.update({"_id":ObjectId(recipe_id)}, submit)
         flash("Recipe successfully updated")
