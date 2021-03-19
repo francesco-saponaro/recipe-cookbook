@@ -12,7 +12,7 @@
                 <div class="col s12 m10 offset-m1">
                     <div class="card-panel recipe-panel yellow accent-4">
                         <div class="col s6">
-                            <p><span class="custom-margin">{{ recipe.recipe_name }}</span> - <em>uploaded by:</em> {{ recipe.created_by }}</p>
+                            <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}</p>
                         </div>
                         <div class="col s3">
                             <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->

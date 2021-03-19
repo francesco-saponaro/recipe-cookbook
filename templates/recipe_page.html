@@ -1,223 +1,113 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <h3 class="recipe-title center-align">Edit Recipe</h3>
-
-    <div class="form-container row yellow accent-4">
-
-        <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" enctype="multipart/form-data">
-            <div class="row">
-                <!--Recipe name-->
-                <div class="input-field col s12">
-                    <input id="recipe_name" value="{{ recipe.recipe_name }}"name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']{3,30}$" title="The recipe name can only contain alphabetic characters, apostrophe and whitespace and needs to be between 3 and 30 characters long. The recipe name can only start with a alphabetic character" required>
-                    <label for="recipe_name">Recipe Name</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <!--Meal type-->
-                <div class="input-field col s12 m4">
-                    <select id="meal_types" name="meal_types" class="validate" required>
-                        <option value="" disabled>Meal type</option>
-                        {% for meal_type in meal_types %}
-                            {% if meal_type.meal_type == recipe.meal_type %}
-                                <option value="{{ meal_type.meal_type }}" selected>{{ meal_type.meal_type }}</option>
-                            {% else %}
-                                <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="meal_types">Meal type</label>
-                </div>
-                <!--Difficulty-->
-                <div class="input-field col s12 m4">
-                    <select id="difficulties" name="difficulties" class="validate" required>
-                        <option value="" disabled>Difficulty</option>
-                        {% for difficulty in difficulties %}
-                            {% if difficulty.difficulty  == recipe.difficulty %}
-                                <option value="{{ difficulty.difficulty }}" selected>{{ difficulty.difficulty }}</option>
-                            {% else %}
-                                <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="difficulties">Difficulty</label>
-                </div>
-                <!--Prep time-->
-                <div class="input-field col s12 m4">
-                    <select id="prep_times" name="prep_times" class="validate" required>
-                        <option value="" disabled>Prep time</option>
-                        {% for prep_time in prep_times %}
-                            {% if prep_time.prep_time == recipe.prep_time %}
-                                <option value="{{ prep_time.prep_time }}" selected>{{ prep_time.prep_time }}</option>
-                            {% else %}
-                                <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="prep_times">Prep time</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <!--Calories-->
-                <div class="input-field col s12 m4">
-                    <select id="calories" name="calories" class="validate" required>
-                        <option value="" disabled>Calories</option>
-                        {% for calorie_amount in calories %}
-                            {% if calorie_amount.calorie_amount == recipe.calorie_amount %}
-                                <option value="{{ calorie_amount.calorie_amount }}" selected>{{ calorie_amount.calorie_amount }}</option>
-                            {% else %}
-                                <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="calories">Calories</label>
-                </div>
-                <!--Dietary requirements-->
-                <div class="input-field col s12 m4">
-                    <select id="dietary_requirements" name="dietary_requirements" class="validate" required multiple>
-                        <option value="" disabled>Dietary requirements</option>
-                        {% for dietary_requirement in dietary_requirements %}
-                            {% if dietary_requirement.dietary_requirement in recipe.dietary_requirement %}
-                                <option value="{{ dietary_requirement.dietary_requirement }}" selected>{{ dietary_requirement.dietary_requirement }}</option>
-                            {% else %}
-                                <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="dietary_requirements">Dietary requirements</label>
-                </div>
-                <!--Allergens-->
-                <div class="input-field col s12 m4">
-                    <select id="allergens" name="allergens" class="validate" required multiple>
-                        <option value="" disabled>Allergens</option>
-                        {% for allergen in allergens %}
-                            {% if allergen.allergen in recipe.allergen %}
-                                <option value="{{ allergen.allergen }}" selected>{{ allergen.allergen }}</option>
-                            {% else %}
-                                <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="allergens">Allergens</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <!--Country-->
-                <div class="input-field col s12 m4">
-                    <input id="countries" value="{{ recipe.country }}" name="countries" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The country name can only contain alphabetic characters, apostrophe and whitespace. The country name can only start with a alphabetic character" required>
-                    <label for="countries">Country</label>
-                </div>
-                <!--Servings-->
-                <div class="input-field col s12 m4">
-                    <select id="servings" name="servings" class="validate" required>
-                        <option value="" disabled>Serving</option>
-                        {% for serving in servings %}
-                            {% if serving.serving == recipe.serving %}
-                                <option value="{{ serving.serving }}" selected>{{ serving.serving }}</option>
-                            {% else %}
-                                <option value="{{ serving.serving }}">{{ serving.serving }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <label for="servings">Servings</label>
-                </div>
-                <!--High protein checkbox-->
-                <div class="input-field col s12 m4">
-                    <p>
-                    <label>
-                        {% if recipe.is_high_protein == "on" %}
-                            <input type="checkbox" id="is_high_protein" name="is_high_protein" checked />
-                            <span class="black-color">High protein</span>
-                        {% else %}
-                            <input type="checkbox" id="is_high_protein" name="is_high_protein" />
-                            <span class="black-color">High protein</span>
-                        {% endif %}
-                    </label>
-                    </p>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col s6">
-                    <h5>Ingredients:</h5>
-                </div>
-                <!--Add and remove ingredient buttons-->
-                <div class="original-buttons input-field col s3">
-                    <a onclick="addIng()" class="btn-floating btn-large waves-effect waves-light light-green darken-2 right"><i class="fas fa-plus"></i></a>
-                 </div>
-                 <div class="original-buttons input-field col s3">
-                    <a onclick="removeIng()" class="btn-floating btn-large waves-effect waves-light red"><i class="fas fa-times right"></i></a>
-                 </div>
-            </div>
-
-            <div id="ingredients-container">
-                {% for ingredient in recipe.ingredient %}
-                    <div class="row">
-                        <!--Ingredient name-->
-                        <div class="input-field col s12 m4">
-                            <input id="ingredient_name" value="{{ ingredient.ingredient_name }}" name="ingredient_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The ingredient name can only contain alphabetic characters, apostrophe and whitespace. The ingredient name can only start with a alphabetic character" required>
-                            <label for="ingredient_name">Name</label>
-                        </div>
-                    <!--Ingredient quantity-->
-                        <div class="input-field col s12 m4">
-                            <input id="quantity" value="{{ ingredient.quantity }}" name="quantity" type="text" class="validate" pattern="\d+" title="Please enter a number" required>
-                            <label for="quantity">Quantity</label>
-                        </div>
-                    <!--Ingredient unit-->
-                        <div class="input-field col s12 m4">
-                            <select id="unit" name="unit" class="browser-default unit-select" required>
-                                <option value="" disabled>Unit</option>
-                                <option value="{{ ingredient.unit }}" selected>{{ ingredient.unit }}</option>
-                                <option value="Ml">Ml</option>
-                                <option value="Litre">Litre</option>
-                                <option value="Ounce">Ounce</option>
-                                <option value="Gram">Gram</option>
-                                <option value="Teaspoon">Teaspoon</option>
-                                <option value="Tablespoon">Tablespoon</option>
-                                <option value="Pinch">Pinch</option>
-                                <option value="None">None</option>
-                            </select>
-                            <label for="units"></label>
-                        </div>  
-                    </div>
-                {% endfor %}
-            </div>
-
-            <div class="row">
-                <div class="col s12">
-                    <h5>Method:</h5>
-                </div>
-            </div>
-            <div class="row">
-                <!--Method-->
-                <div class="input-field col s12">
-                <textarea id="description" name="description" class="materialize-textarea" minlength=50 title="The method description must be at least 50 characters long" required>{{ recipe.description }}</textarea>
-                <label for="description">Describe the method</label>
-                </div>
-            </div>
-
-            <div class="row">
-                <!--Recipe picture-->
-                <div class="col s12 center-align">
-                    <p class="black-color">Add a picture of your recipe dish (Optional)</p>
-                    <input class="center-align" type="file" name="recipe_image">
-                </div>
-            </div>
-            
-            <div class="row">
-                <!--Submit and cancel buttons-->
-                <div class="col s12 center-align">
-                    <a href="{{ url_for('get_recipes') }}" class="btn red waves-effect waves-light">Cancel</a>
-                    <button class="btn waves-effect waves-light light-green darken-2" type="submit">Edit recipe
-                        <i class="fas fa-plus-square"></i>
-                    </button>
-                </div>
-            </div>
-        </form>
+    <div class="row">
+        <div class="col s12 recipe-title center-align">
+            <h3>{{ recipe.recipe_name.capitalize() }} {% if 'Vegan' in recipe.dietary_requirement %}<span><i class="fas fa-leaf vg-icon"></i></span>{% endif %}</h3>
+            <h6><em>uploaded by:</em> {{ recipe.created_by }}</h6>
+        </div>
     </div>
-   
-    <script src="{{ url_for('static', filename='js/add_recipe.js') }}"></script>
+
+    <!--Recipe picture, if exists-->
+    {% if recipe.recipe_image_url %}
+        <div class="row">
+            <div class="col s12">
+                <img class="recipe-image" src="{{ recipe.recipe_image_url }}" alt="{{ recipe.recipe_image_name }}">
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="form-container recipe-container row yellow accent-4 center-align">
+
+        <div class="row">
+            <!--Meal type-->
+            <div class="input-field col s12 m4">
+                <h5>Meal type:</h5>
+                <h6>{{ recipe.meal_type }}</h6>
+            </div>
+            <!--Difficulty-->
+            <div class="input-field col s12 m4">
+                <h5>Difficulty:</h5>
+                <h6>{{ recipe.difficulty }}</h6>
+            </div>
+            <!--Prep time-->
+            <div class="input-field col s12 m4">
+                <h5>Prep time:</h5>
+                <h6>{{ recipe.prep_time }}</h6>
+            </div>
+        </div>
+
+        <div class="row">
+            <!--Calories-->
+            <div class="input-field col s12 m4">
+                <h5>Calories:</h5>
+                <h6>{{ recipe.calorie_amount }}</h6>
+            </div>
+            <!--Dietary requirements-->
+            <div class="input-field col s12 m4">
+                <h5>Dietary requirements:</h5>
+                <ul class="recipe-ul"> 
+                {% for dietary_requirement in recipe.dietary_requirement %}
+                    <li class="recipe-li"><h6>{{ dietary_requirement }}</h6></li>
+                {% endfor %}
+                </ul>
+            </div>
+            <!--Allergens-->
+            <div class="input-field col s12 m4">
+                <h5>Allergens:</h5>
+                <ul class="recipe-ul">
+                {% for allergen in recipe.allergen %}
+                    <li class="recipe-li"><h6>{{ allergen }}</h6></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <!--Country-->
+            <div class="input-field col s12 m4">
+                <h5>Country:</h5>
+                <h6>{{ recipe.country.capitalize() }}</h6>
+            </div>
+            <!--Servings-->
+            <div class="input-field col s12 m4">
+                <h5>Servings:</h5>
+                <h6>{{ recipe.serving }}</h6>
+            </div>
+            <!--High protein checkbox-->
+            <div class="input-field col s12 m4">
+                {% if recipe.is_high_protein == "on" %}
+                    <h6>High Protein <i class="fas fa-dumbbell fa-lg"></i></h6>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <h5>Ingredients:</h5>
+            </div>
+        </div>
+
+        <!--Ingredients-->
+        <ul class="recipe-ul">
+            {% for ingredient in recipe.ingredient %}
+                <li class="recipe-li"><h6><span class="underline">{{ ingredient.ingredient_name.capitalize() }}</span> {{ ingredient.quantity }} {{ ingredient.unit }}</h6></li>
+            {% endfor %}
+        </ul>   
+        
+
+        <div class="row">
+            <div class="col s12">
+                <h5>Method:</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <!--Method-->
+            <div class="input-field col s12 word-wrap">
+                {{ recipe.description.capitalize() }}
+            </div>
+        </div>
+
+    </div>
 {% endblock %}

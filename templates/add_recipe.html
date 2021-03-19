@@ -4,8 +4,8 @@
     <h3 class="recipe-title center-align">Add Recipe</h3>
 
     <div class="form-container row yellow accent-4">
-                                                                             <!--Required to add and save files-->
-        <form class="col s12" method="POST" action="{{ url_for('add_recipe') }}" enctype="multipart/form-data">
+        
+        <form class="col s12" method="POST" action="{{ url_for('add_recipe') }}">
             <div class="row">
                 <!--Recipe name-->
                 <div class="input-field col s12">
@@ -156,6 +156,7 @@
                     <h5>Method:</h5>
                 </div>
             </div>
+            
             <div class="row">
                 <!--Method-->
                 <div class="input-field col s12">
@@ -165,10 +166,10 @@
             </div>
 
             <div class="row">
-                <!--Recipe picture-->
+                <!--Recipe picture URL-->
                 <div class="col s12 center-align">
-                    <p class="black-color">Add a picture of your recipe dish (Optional)</p>
-                    <input class="center-align" type="file" name="recipe_image">
+                    <p class="black-color">Add a URL for your recipe dish picture (Optional)</p>
+                    <input class="center-align validate" type="text" name="recipe_image_url" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
                 </div>
             </div>
 

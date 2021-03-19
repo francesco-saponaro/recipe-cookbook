@@ -51,6 +51,7 @@ def register():
     # Default GET method if not POST
     return render_template("register.html")
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -122,10 +123,6 @@ def add_recipe():
                              }
             # Append all dictionaries to ingredients list, which in turn will be passed inside the recipe dictionary
             ingredients.append(ingredientdict)
-
-        if "recipe_image" in request.files:
-            recipe_image = request.files["recipe_image"]
-            mongo.save_file(recipe_image.filename, recipe_image)
         
         # Create the dictionary to be inserted in the mongodb "recipe" collection
         recipe = {
@@ -142,7 +139,7 @@ def add_recipe():
             "country": request.form.get("countries").lower(),
             "ingredient": ingredients,
             "description": request.form.get("description"),
-            "recipe_image_name": recipe_image.filename,
+            "recipe_image_url": request.form.get("recipe_image_url"),
             # Grab this value from user in session
             "created_by": session["user_session"]
         }
@@ -216,6 +213,7 @@ def edit_recipe(recipe_id):
             "country": request.form.get("countries").lower(),
             "ingredient": ingredients,
             "description": request.form.get("description"),
+            "recipe_image_url": request.form.get("recipe_image_url"),
             # Grab this value from logged in user
             "created_by": session["user_session"]
         }
@@ -260,12 +258,11 @@ def recipe_page(recipe_id):
     return render_template("recipe_page.html", recipe=recipe)
 
 
-
 @app.route("/delete_recipe/<recipe_id>")
 def delete_recipe(recipe_id):
-   
     # Grab the current recipe and remove it
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    # Delete current recipe
     mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
 
     flash("Recipe successfully deleted")

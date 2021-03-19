@@ -5,11 +5,11 @@
 
     <div class="form-container row yellow accent-4">
 
-        <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" enctype="multipart/form-data">
+        <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}">
             <div class="row">
                 <!--Recipe name-->
                 <div class="input-field col s12">
-                    <input id="recipe_name" value="{{ recipe.recipe_name }}"name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']{3,30}$" title="The recipe name can only contain alphabetic characters, apostrophe and whitespace and needs to be between 3 and 30 characters long. The recipe name can only start with a alphabetic character" required>
+                    <input id="recipe_name" value="{{ recipe.recipe_name }}" name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']{3,30}$" title="The recipe name can only contain alphabetic characters, apostrophe and whitespace and needs to be between 3 and 30 characters long. The recipe name can only start with a alphabetic character" required>
                     <label for="recipe_name">Recipe Name</label>
                 </div>
             </div>
@@ -191,6 +191,7 @@
                     <h5>Method:</h5>
                 </div>
             </div>
+            
             <div class="row">
                 <!--Method-->
                 <div class="input-field col s12">
@@ -200,10 +201,10 @@
             </div>
 
             <div class="row">
-                <!--Recipe picture-->
+                <!--Recipe picture URL-->
                 <div class="col s12 center-align">
-                    <p class="black-color">Add a picture of your recipe dish (Optional)</p>
-                    <input class="center-align" type="file" name="recipe_image">
+                    <p class="black-color">Add a URL for your recipe dish picture (Optional)</p>
+                    <input class="center-align validate" value="{{ recipe.recipe_image_url }}" type="text" name="recipe_image_url" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
                 </div>
             </div>
             

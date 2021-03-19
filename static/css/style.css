@@ -16,6 +16,14 @@ h4 {
     margin: 1.9466666667rem 0;
 }
 
+.underline {
+    text-decoration: underline;
+}
+
+.word-wrap {
+    word-wrap: break-word;
+}
+
 /* Colors */
 .vegan-color {
     color: #689f38;
@@ -146,5 +154,30 @@ label > span {
 
 [type="file"] {
     margin-bottom:25px;
+}
+
+/* Recipe page */
+.recipe-container h5 {
+    color:#689f38;
+}
+
+.recipe-ul {
+    text-align: -webkit-center;
+}
+
+ul:not(.browser-default)>.recipe-li {
+    list-style-type: disc;
+    width: fit-content;
+}
+
+h3 span {
+    font-size: 0.5em;
+}
+
+.recipe-image {
+    height:500px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
