@@ -1,7 +1,7 @@
 import os
 from flask import (
     Flask, flash, render_template, redirect, request, session, url_for)
-from flask_pymongo import PyMongo
+from flask_pymongo import PyMongo, pymongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 if os.path.exists("env.py"):
@@ -20,9 +20,28 @@ mongo = PyMongo(app)
 @app.route("/get_recipes")
 def get_recipes():
     # We grab the recipes from mongodb "recipes" collection to populate the page
-    recipes = mongo.db.recipes.find()
+    recipe = mongo.db.recipes
+    total_recipes = mongo.db.recipes.count()
+
+    offset = 0
+    limit = 5
+
+    if "limit" in request.args:
+        limit = int(request.args.get("limit"))
+        offset = int(request.args.get("offset"))
+
+    starting_id = recipe.find()
+    last_id = starting_id[offset]['_id']
+
+    recipes = recipe.find({'_id' : {'$gte' : last_id}}).limit(limit)
+
+
+    next_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset + limit)
+    prev_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset - limit) 
+
+
     ingredients = mongo.db.ingredients.find()
-    return render_template("index.html", recipes=recipes, ingredients=ingredients)
+    return render_template("index.html", recipes=recipes, ingredients=ingredients, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -84,11 +103,30 @@ def profile(username):
     # Grab the session user's username from mongoDB, this will be the argument for our function and therefore our URL, we will use it to welcome the user to the application
     username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
     # Grab the recipes from mongodb "recipes" collection to populate the page
-    recipes = mongo.db.recipes.find()
+    recipe = mongo.db.recipes
+    total_recipes = mongo.db.recipes.count()
+
+    offset = 0
+    limit = 5
+
+    if "limit" in request.args:
+        limit = int(request.args.get("limit"))
+        offset = int(request.args.get("offset"))
+
+    starting_id = recipe.find()
+    last_id = starting_id[offset]['_id']
+
+    recipes = recipe.find({'_id' : {'$gte' : last_id}}).limit(limit)
+
+
+    next_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset + limit)
+    prev_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset - limit) 
+
+    ingredients = mongo.db.ingredients.find()
 
     # Defensive programming
     if session["user_session"]:
-        return render_template("profile.html", username=username, recipes=recipes)
+        return render_template("profile.html", username=username, recipes=recipes, ingredients=ingredients, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes)
 
     # If not logged in redirect to log in page
     return redirect(url_for("login"))

@@ -2,7 +2,7 @@
 {% block content %}
 
     <h3 class="center-align">{{ username|capitalize }}'s profile</h3>
-    <h3 class="custom-margin">Your recipes:</h3>
+    <h3 class="custom-margin center-align">Your recipes:</h3>
 
     <!--User's recipe panels-->
     {% for recipe in recipes %}
@@ -13,6 +13,16 @@
                     <div class="card-panel recipe-panel yellow accent-4">
                         <div class="col s6">
                             <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}</p>
+                        </div>
+                        <div class="col s3">
+                            <!--Recipe high protein icon-->
+                            {% if recipe.is_high_protein == "on" %}
+                                <i class="fas fa-dumbbell fa-lg"></i>
+                            {% endif %}
+                            <!--Recipe vegan icon-->
+                            {% if 'Vegan' in recipe.dietary_requirement %}
+                                <i class="fas fa-leaf fa-lg vg-icon"></i>
+                            {% endif %}
                         </div>
                         <div class="col s3">
                             <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->
@@ -37,5 +47,16 @@
             </div>
         {% endif %}
     {% endfor %}
+
+    <div class="row">
+        <div class="col s12 pagination">
+        {% if offset > 0 %}
+            <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
+        {% endif %}
+        {% if (offset + 5) < total_recipes %}
+            <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">next</a>
+        {% endif %}
+        </div>
+    </div>
 
 {% endblock %}

@@ -13,8 +13,8 @@
     </div>
 
     <h3 class="center-align home-header">Recipes</h3>
-    <h3>We will have the search card here</h3>
-
+    <h3></h3>
+    
     <!--Recipe panel-->
     {% for recipe in recipes %}
         <div class="row">
@@ -58,5 +58,17 @@
             </div>
         </div>
     {% endfor %}
+
+    <div class="row">
+        <div class="col s12 pagination">
+        {% if offset > 0 %}
+            <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
+        {% endif %}
+        {% if (offset + 5) < total_recipes %}
+            <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">next</a>
+        {% endif %}
+        </div>
+    </div>
+    
     
 {% endblock %}

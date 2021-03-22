@@ -85,6 +85,20 @@ input:-webkit-autofill:active
     margin-top:0;
 }
 
+.pagination {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0 40px 0;
+}
+
+.prev-next-btn {
+    color:#3d3d3d;
+    border-radius:35px;
+    width: 150px;
+    text-transform:capitalize;
+}
+
 /* Recipe panel */
 .recipe-panel {
     padding:12px 24px;
