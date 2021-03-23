@@ -20,19 +20,18 @@
         <div class="row">
             <div class="col s12 m10 offset-m1">
                 <div class="card-panel recipe-panel yellow accent-4">
-                    <div class="col s6">
+                    <div class="col s9">
                         <!--Recipe name-->
-                        <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}</p>
-                    </div>
-                    <div class="col s3">
+                        <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
                         <!--Recipe high protein icon-->
                         {% if recipe.is_high_protein == "on" %}
-                            <i class="fas fa-dumbbell fa-lg"></i>
+                            <i class="fas fa-dumbbell fa-lg protein-icon"></i>
                         {% endif %}
                         <!--Recipe vegan icon-->
                         {% if 'Vegan' in recipe.dietary_requirement %}
                             <i class="fas fa-leaf fa-lg vg-icon"></i>
                         {% endif %}
+                        </p>
                     </div>
                     <div class="col s3">
                         {% if session.user_session|lower == recipe.created_by|lower %}
@@ -60,12 +59,12 @@
     {% endfor %}
 
     <div class="row">
-        <div class="col s12 pagination">
+        <div class="col s12">
         {% if offset > 0 %}
             <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
         {% endif %}
         {% if (offset + 5) < total_recipes %}
-            <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">next</a>
+            <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4 next-btn">next</a>
         {% endif %}
         </div>
     </div>

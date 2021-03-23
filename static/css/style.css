@@ -85,18 +85,16 @@ input:-webkit-autofill:active
     margin-top:0;
 }
 
-.pagination {
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px 0 40px 0;
-}
-
 .prev-next-btn {
     color:#3d3d3d;
     border-radius:35px;
+    margin: 20px 0 40px 0;
     width: 150px;
     text-transform:capitalize;
+}
+
+.next-btn {
+    float:right;
 }
 
 /* Recipe panel */
@@ -114,6 +112,10 @@ input:-webkit-autofill:active
 .vg-icon{
     color:#64dd17;
     padding-left: 5px;
+}
+
+.protein-icon{
+    padding-left: 10px;
 }
 
 .modal .modal-content {

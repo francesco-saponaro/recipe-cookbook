@@ -119,8 +119,8 @@ def profile(username):
     recipes = recipe.find({'_id' : {'$gte' : last_id}}).limit(limit)
 
 
-    next_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset + limit)
-    prev_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset - limit) 
+    next_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset + limit)
+    prev_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset - limit) 
 
     ingredients = mongo.db.ingredients.find()
 
@@ -190,10 +190,11 @@ def add_recipe():
             if not existing_ingredient:
                 mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
+        country = request.form.get("countries")
         # Check if country already exist in database
         existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
         # If country is not already in database, grab country from form and insert it (in lowercase) in the mongodb "countries" collection
-        if not existing_country:
+        if not existing_country and country != "":
             mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
 
         # Insert dictionary in in the mongodb "recipes" collection
@@ -264,10 +265,11 @@ def edit_recipe(recipe_id):
             if not existing_ingredient:
                 mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
+        country = request.form.get("countries")
         # Check if country already exist in database
         existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
         # If country is not already in database, grab country from form and insert it (in lowercase) in the mongodb "countries" collection
-        if not existing_country:
+        if not existing_country and country != "":
             mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
 
         # Update dictionary in mongodb database. "update" method takes two parameters, first is the dictionary to be updated and the second is the updated dictionary. We find the dictionary to be updated through the recipe.id coming from the route

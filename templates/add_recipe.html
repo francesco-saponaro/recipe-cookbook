@@ -9,7 +9,7 @@
             <div class="row">
                 <!--Recipe name-->
                 <div class="input-field col s12">
-                    <input id="recipe_name" name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']{3,30}$" title="The recipe name can only contain alphabetic characters, apostrophe and whitespace and needs to be between 3 and 30 characters long. The recipe name can only start with a alphabetic character" required>
+                    <input id="recipe_name" name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s\-']{3,40}$" title="The recipe name can only contain alphabetic characters, apostrophe, hyphen and whitespace and needs to be between 3 and 30 characters long. The recipe name can only start with a alphabetic character" required>
                     <label for="recipe_name">Recipe Name</label>
                 </div>
             </div>
@@ -84,7 +84,7 @@
             <div class="row">
                 <!--Country-->
                 <div class="input-field col s12 m4">
-                    <input id="countries" name="countries" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The country name can only contain alphabetic characters, apostrophe and whitespace. The country name can only start with a alphabetic character" required>
+                    <input id="countries" name="countries" type="text" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The country name can only contain alphabetic characters, apostrophe and whitespace. The country name can only start with a alphabetic character">
                     <label for="countries">Country</label>
                 </div>
                 <!--Servings-->

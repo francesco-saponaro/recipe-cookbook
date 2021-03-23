@@ -91,7 +91,7 @@
         <!--Ingredients-->
         <ul class="recipe-ul">
             {% for ingredient in recipe.ingredient %}
-                <li class="recipe-li"><h6><span class="underline">{{ ingredient.ingredient_name.capitalize() }}</span> {{ ingredient.quantity }} {{ ingredient.unit }}</h6></li>
+                <li class="recipe-li"><h6><span class="underline">{{ ingredient.ingredient_name.capitalize() }}</span> {{ ingredient.quantity }} {% if 'None' not in ingredient.unit %} {{ ingredient.unit }} {% endif %}</h6></li>
             {% endfor %}
         </ul>   
         
