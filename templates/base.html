@@ -34,13 +34,13 @@
 
                 <!-- Dropdown Structure -->
                 <ul id='dropdown1' class='dropdown-content'>
-                    <li><a href="badges.html">Starters</a></li>
-                    <li><a href="collapsible.html">Brunch</a></li>
-                    <li><a href="mobile.html">Lunch</a></li>
-                    <li><a href="mobile.html">Dinner</a></li>
-                    <li><a href="mobile.html">Desserts</a></li>
-                    <li><a href="mobile.html"><span class="vegan-color">Vegan</span></a></li>
-                    <li><a href="mobile.html">By country</a></li>
+                    <li><a href="{{ url_for('starters') }}">Starters</a></li>
+                    <li><a href="{{ url_for('brunch') }}">Brunch</a></li>
+                    <li><a href="{{ url_for('lunch') }}">Lunch</a></li>
+                    <li><a href="{{ url_for('dinner') }}">Dinner</a></li>
+                    <li><a href="{{ url_for('desserts') }}">Desserts</a></li>
+                    <li><a href="{{ url_for('vegan') }}"><span class="vegan-color">Vegan</span></a></li>
+                    <li><a href="{{ url_for('by_country') }}">By country</a></li>
                 </ul>
             </div>
         </nav>
@@ -49,13 +49,13 @@
         <ul class="sidenav" id="mobile-demo">
             <li><h4 class="center-align">Recipe <span class="vegan-color">Cookbook</span></h4></li>
             <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
-            <li><a href="badges.html">Starters</a></li>
-            <li><a href="collapsible.html">Brunch</a></li>
-            <li><a href="mobile.html">Lunch</a></li>
-            <li><a href="mobile.html">Dinner</a></li>
-            <li><a href="mobile.html">Desserts</a></li>
-            <li><a href="mobile.html"><span class="vegan-color">Vegan</span></a></li>
-            <li><a href="mobile.html">By country</a></li>
+            <li><a href="{{ url_for('starters') }}">Starters</a></li>
+            <li><a href="{{ url_for('brunch') }}">Brunch</a></li>
+            <li><a href="{{ url_for('lunch') }}">Lunch</a></li>
+            <li><a href="{{ url_for('dinner') }}">Dinner</a></li>
+            <li><a href="{{ url_for('desserts') }}">Desserts</a></li>
+            <li><a href="{{ url_for('vegan') }}"><span class="vegan-color">Vegan</span></a></li>
+            <li><a href="{{ url_for('by_country') }}">By country</a></li>
             <li><a href="mobile.html">Dashboard</a></li>
             {% if session.user_session %}
                 <li><a href="{{ url_for('profile', username=session['user_session']) }}">Profile</a></li>

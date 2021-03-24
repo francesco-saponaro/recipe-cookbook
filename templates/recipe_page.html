@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row valign-wrapper">
             <!--Country-->
             <div class="input-field col s12 m4">
                 <h5>Country:</h5>
@@ -105,7 +105,9 @@
         <div class="row">
             <!--Method-->
             <div class="input-field col s12 word-wrap">
-                {{ recipe.description.capitalize() }}
+                {% autoescape false %}
+                    {{ recipe.description|replace(".", "<br/>") }}
+                {% endautoescape %}
             </div>
         </div>
 

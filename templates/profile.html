@@ -5,58 +5,63 @@
     <h3 class="custom-margin center-align">Your recipes:</h3>
 
     <!--User's recipe panels-->
-    {% for recipe in recipes %}
-        <!--Display recipes if created by the user-->
-        {% if session.user_session|lower == recipe.created_by|lower %}
-            <div class="row">
-                <div class="col s12 m10 offset-m1">
-                    <div class="card-panel recipe-panel yellow accent-4">
-                        <div class="col s9">
-                            <!--Recipe name-->
-                            <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
-                            <!--Recipe high protein icon-->
-                            {% if recipe.is_high_protein == "on" %}
-                                <i class="fas fa-dumbbell fa-lg protein-icon"></i>
-                            {% endif %}
-                            <!--Recipe vegan icon-->
-                            {% if 'Vegan' in recipe.dietary_requirement %}
-                                <i class="fas fa-leaf fa-lg vg-icon"></i>
-                            {% endif %}
-                            </p>
-                        </div>
-                        <div class="col s3">
-                            <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->
-                            <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
+    {% if user_recipes|length > 0 %}
+        {% for recipe in recipes %}
+            <!--Display recipes if created by the user-->
+            {% if session.user_session|lower == recipe.created_by|lower %}
+                <div class="row">
+                    <div class="col s12 m10 offset-m1">
+                        <div class="card-panel recipe-panel yellow accent-4">
+                            <div class="col s9">
+                                <!--Recipe name-->
+                                <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
+                                <!--Recipe high protein icon-->
+                                {% if recipe.is_high_protein == "on" %}
+                                    <i class="fas fa-dumbbell fa-lg protein-icon"></i>
+                                {% endif %}
+                                <!--Recipe vegan icon-->
+                                {% if 'Vegan' in recipe.dietary_requirement %}
+                                    <i class="fas fa-leaf fa-lg vg-icon"></i>
+                                {% endif %}
+                                </p>
+                            </div>
+                            <div class="col s3">
+                                <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->
+                                <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
 
-                            <!-- Delete confimation Modal Trigger -->
-                            <a class="red recipe-buttons btn-small modal-trigger" href="#modal1">Delete</a>
-                            <!-- Modal Structure -->
-                            <div id="modal1" class="modal yellow accent-4">
-                                <div class="modal-content">
-                                <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
-                                </div>
-                                <div class="modal-footer yellow accent-4">
-                                <a href="{{ url_for('get_recipes') }}" class="modal-close waves-effect waves-green btn-small red">Cancel</a>
-                                <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument-->
-                                <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
+                                <!-- Delete confimation Modal Trigger -->
+                                <a class="red recipe-buttons btn-small modal-trigger" href="#modal1">Delete</a>
+                                <!-- Modal Structure -->
+                                <div id="modal1" class="modal yellow accent-4">
+                                    <div class="modal-content">
+                                    <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
+                                    </div>
+                                    <div class="modal-footer yellow accent-4">
+                                    <a href="{{ url_for('get_recipes') }}" class="modal-close waves-effect waves-green btn-small red">Cancel</a>
+                                    <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument-->
+                                    <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% endif %}
-    {% endfor %}
+            {% endif %}
+        {% endfor %}
 
-    <div class="row">
-        <div class="col s12">
-        {% if offset > 0 %}
-            <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
-        {% endif %}
-        {% if (offset + 5) < total_recipes %}
-            <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4 next-btn">next</a>
-        {% endif %}
+        <div class="row">
+            <div class="col s12">
+            {% if offset > 0 %}
+                <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
+            {% endif %}
+            {% if (offset + 5) < total_recipes %}
+                <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4 next-btn">next</a>
+            {% endif %}
+            </div>
         </div>
-    </div>
+        
+    {% else %}
+        <h3 class="red-text text-darken-4 center-align">No Recipes Uploaded Yet</h3>
+    {% endif %}
 
 {% endblock %}

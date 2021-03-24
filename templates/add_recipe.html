@@ -62,7 +62,7 @@
                 <!--Dietary requirements-->
                 <div class="input-field col s12 m4">
                     <select id="dietary_requirements" name="dietary_requirements" class="validate" required multiple>
-                        <option value="" disabled selected>Dietary requirements</option>
+                        <option value="" disabled>Dietary requirements</option>
                         {% for dietary_requirement in dietary_requirements %}
                             <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
                         {% endfor %}
@@ -72,7 +72,7 @@
                 <!--Allergens-->
                 <div class="input-field col s12 m4">
                     <select id="allergens" name="allergens" class="validate" required multiple>
-                        <option value="" disabled selected>Allergens</option>
+                        <option value="" disabled>Allergens</option>
                         {% for allergen in allergens %}
                             <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
                         {% endfor %}
@@ -161,7 +161,7 @@
                 <!--Method-->
                 <div class="input-field col s12">
                 <textarea id="description" name="description" class="materialize-textarea" minlength=50 title="The method description must be at least 50 characters long" required></textarea>
-                <label for="description">Describe the method</label>
+                <label for="description">Describe the method <span><small>(Preferable format: "STEP1 Your Text. STEP2 Your Text." and so on...)</small></span></label>
                 </div>
             </div>
 
@@ -169,7 +169,7 @@
                 <!--Recipe picture URL-->
                 <div class="col s12 center-align">
                     <p class="black-color">Add a URL for your recipe dish picture (Optional)</p>
-                    <input class="center-align validate" type="text" name="recipe_image_url" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
+                    <input class="center-align validate" type="text" name="recipe_image_url" title="The URL must end with the with any of the following formats: jpg/gif/png" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
                 </div>
             </div>
 

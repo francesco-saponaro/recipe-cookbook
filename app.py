@@ -19,10 +19,6 @@ mongo = PyMongo(app)
 @app.route("/")
 @app.route("/get_recipes")
 def get_recipes():
-    # We grab the recipes from mongodb "recipes" collection to populate the page
-    recipe = mongo.db.recipes
-    total_recipes = mongo.db.recipes.count()
-
     offset = 0
     limit = 5
 
@@ -30,18 +26,84 @@ def get_recipes():
         limit = int(request.args.get("limit"))
         offset = int(request.args.get("offset"))
 
-    starting_id = recipe.find()
+    total_recipes = mongo.db.recipes.count()
+    starting_id = mongo.db.recipes.find()
     last_id = starting_id[offset]['_id']
 
-    recipes = recipe.find({'_id' : {'$gte' : last_id}}).limit(limit)
-
+    recipes = mongo.db.recipes.find({'_id' : {'$gte' : last_id}}).limit(limit)
 
     next_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset + limit)
     prev_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset - limit) 
 
+    return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id)
 
-    ingredients = mongo.db.ingredients.find()
-    return render_template("index.html", recipes=recipes, ingredients=ingredients, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes)
+
+@app.route("/search", methods=["GET", "POST"])
+def search():
+
+    query = request.form.get("query")
+    starting_id = mongo.db.recipes.find({"$text": {"$search": query}})
+
+    if starting_id.count() > 0:
+        recipes = list(mongo.db.recipes.find({"$text": {"$search": query}}))
+    else:
+        recipes = list(mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}}))
+
+    return render_template("search.html", recipes=recipes)
+
+
+@app.route("/by_country")
+def by_country():
+    countries = list(mongo.db.countries.find())
+    recipes = list(mongo.db.recipes.find())
+
+    return render_template("by_country.html", recipes=recipes, countries=countries)
+
+
+@app.route("/starters")
+def starters():
+    meal_types = mongo.db.meal_types.find()
+    recipes = list(mongo.db.recipes.find())
+
+    return render_template("starters.html", recipes=recipes, meal_types=meal_types)
+
+
+@app.route("/lunch")
+def lunch():
+    meal_types = mongo.db.meal_types.find()
+    recipes = list(mongo.db.recipes.find())
+
+    return render_template("lunch.html", recipes=recipes, meal_types=meal_types)
+
+
+@app.route("/brunch")
+def brunch():
+    meal_types = mongo.db.meal_types.find()
+    recipes = list(mongo.db.recipes.find())
+
+    return render_template("brunch.html", recipes=recipes, meal_types=meal_types)
+
+
+@app.route("/dinner")
+def dinner():
+    meal_types = mongo.db.meal_types.find()
+    recipes = list(mongo.db.recipes.find())
+
+    return render_template("dinner.html", recipes=recipes, meal_types=meal_types)
+
+
+@app.route("/desserts")
+def desserts():
+    meal_types = mongo.db.meal_types.find()
+    recipes = list(mongo.db.recipes.find())
+    return render_template("desserts.html", recipes=recipes, meal_types=meal_types)
+
+
+@app.route("/vegan")
+def vegan():
+    recipes = list(mongo.db.recipes.find())
+
+    return render_template("vegan.html", recipes=recipes)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -117,16 +179,15 @@ def profile(username):
     last_id = starting_id[offset]['_id']
 
     recipes = recipe.find({'_id' : {'$gte' : last_id}}).limit(limit)
+    user_recipes = list(mongo.db.recipes.find({"created_by": session["user_session"]}))
 
 
     next_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset + limit)
     prev_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset - limit) 
 
-    ingredients = mongo.db.ingredients.find()
-
     # Defensive programming
     if session["user_session"]:
-        return render_template("profile.html", username=username, recipes=recipes, ingredients=ingredients, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes)
+        return render_template("profile.html", username=username, recipes=recipes, user_recipes=user_recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes)
 
     # If not logged in redirect to log in page
     return redirect(url_for("login"))

@@ -196,7 +196,7 @@
                 <!--Method-->
                 <div class="input-field col s12">
                 <textarea id="description" name="description" class="materialize-textarea" minlength=50 title="The method description must be at least 50 characters long" required>{{ recipe.description }}</textarea>
-                <label for="description">Describe the method</label>
+                <label for="description">Describe the method <span><small>(Preferable format: "STEP1 Your Text. STEP2 Your Text." and so on...)</small></span></label>
                 </div>
             </div>
 
@@ -204,7 +204,7 @@
                 <!--Recipe picture URL-->
                 <div class="col s12 center-align">
                     <p class="black-color">Add a URL for your recipe dish picture (Optional)</p>
-                    <input class="center-align validate" value="{{ recipe.recipe_image_url }}" type="text" name="recipe_image_url" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
+                    <input class="center-align validate" value="{{ recipe.recipe_image_url }}" type="text" name="recipe_image_url" title="The URL must end with the with any of the following formats: jpg/gif/png" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
                 </div>
             </div>
             

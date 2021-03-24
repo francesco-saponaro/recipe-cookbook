@@ -24,6 +24,14 @@ h4 {
     word-wrap: break-word;
 }
 
+.bold {
+    font-weight: 600;
+}
+
+.larger {
+    font-size: 1.3em;
+}
+
 /* Colors */
 .vegan-color {
     color: #689f38;
@@ -197,3 +205,13 @@ h3 span {
     margin-right: auto;
 }
 
+/*Recipes by meal types pages*/
+.meal-type-header {
+    margin: 20px 0 40px 0;
+}
+
+/*Recipes by country*/
+.country-margin {
+    margin-left: 40px;
+    margin-bottom: 15px;
+}
