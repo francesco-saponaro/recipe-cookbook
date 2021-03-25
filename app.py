@@ -54,7 +54,7 @@ def search():
 
 @app.route("/by_country")
 def by_country():
-    countries = list(mongo.db.countries.find())
+    countries = sorted(mongo.db.countries.find(), key=lambda x: x['country'])
     recipes = list(mongo.db.recipes.find())
 
     return render_template("by_country.html", recipes=recipes, countries=countries)
