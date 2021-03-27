@@ -16,6 +16,18 @@ h4 {
     margin: 1.9466666667rem 0;
 }
 
+.bottom-margin {
+    margin-bottom:1.9466666667rem;
+}
+
+.no-bottom-margin {
+    margin-bottom:0;
+}
+
+.no-top-margin {
+    margin-top:0;
+}
+
 .underline {
     text-decoration: underline;
 }
@@ -30,6 +42,23 @@ h4 {
 
 .larger {
     font-size: 1.3em;
+}
+
+.form-container {
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.padding-top {
+    padding-top:40px;
+}
+
+.margin-center {
+    margin: 0 auto;
+}
+
+.right-float {
+    float:right;
 }
 
 /* Colors */
@@ -73,10 +102,6 @@ input:-webkit-autofill:active
 }
 
 /* Home page*/
-.add-filter-row {
-    margin-bottom:0;
-}
-
 .add-filter-btn {
     color:#3d3d3d;
     border-radius:35px;
@@ -85,24 +110,12 @@ input:-webkit-autofill:active
     text-transform:capitalize;
 }
 
-.filter-btn {
-    float:right;
-}
-
-.home-header {
-    margin-top:0;
-}
-
 .prev-next-btn {
     color:#3d3d3d;
     border-radius:35px;
     margin: 20px 0 40px 0;
     width: 150px;
     text-transform:capitalize;
-}
-
-.next-btn {
-    float:right;
 }
 
 /* Recipe panel */
@@ -131,11 +144,6 @@ input:-webkit-autofill:active
 }
 
 /* add recipe page*/
-.form-container {
-    padding: 20px;
-    border-radius: 15px;
-}
-
 .input-field>label {
     color: #000000;
 }
@@ -178,6 +186,16 @@ label > span {
 
 [type="file"] {
     margin-bottom:25px;
+}
+
+/*Filter page*/
+.cancel-btn {
+    width:49%;
+}
+
+.apply-btn {
+    width:49%;
+    float:right;
 }
 
 /* Recipe page */

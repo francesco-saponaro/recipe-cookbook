@@ -35,26 +35,92 @@ def get_recipes():
     next_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset + limit)
     prev_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset - limit) 
 
-    return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id)
+    meal_types = mongo.db.meal_types.find()
+    difficulties = mongo.db.difficulties.find()
+    prep_times = mongo.db.prep_times.find()
+    calories = mongo.db.calories.find()
+    dietary_requirements = mongo.db.dietary_requirements.find()
+    allergens = mongo.db.allergens.find()
+    countries = mongo.db.countries.find().sort("country", 1)
+
+    return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, countries=countries)
+
+@app.route("/filter_search", methods=['GET','POST'])
+def filter_search():
+    
+    meal_types = mongo.db.meal_types.find()
+    difficulties = mongo.db.difficulties.find()
+    prep_times = mongo.db.prep_times.find()
+    calories = mongo.db.calories.find()
+    dietary_requirements = mongo.db.dietary_requirements.find({"dietary_requirement": {"$nin": ["None"]}})
+    allergens = mongo.db.allergens.find({"allergen": {"$nin": ["None"]}})
+    countries = mongo.db.countries.find().sort("country", 1)
+
+    return render_template("filter_search.html", meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, countries=countries)
 
 
-@app.route("/search", methods=["GET", "POST"])
-def search():
+@app.route("/filter_results", methods=['GET','POST'])
+def filter_results():
 
-    query = request.form.get("query")
-    starting_id = mongo.db.recipes.find({"$text": {"$search": query}})
+    recipe = {
+        "meal_type": request.form.get("meal_types"),
+        "difficulty": request.form.get("difficulties"),
+        "prep_time": request.form.get("prep_times"),
+        "calorie_amount": request.form.get("calories"),
+        "is_high_protein": request.form.get("is_high_protein"),
+        "country": request.form.get("countries")
+    }
 
-    if starting_id.count() > 0:
-        recipes = list(mongo.db.recipes.find({"$text": {"$search": query}}))
+    final_results = {}
+
+    for key, value in recipe.items():
+        if value != None:
+            final_results.update({key: value})
+    print(final_results)
+
+    allergens = request.form.getlist("allergens")
+
+    if allergens != []:
+        final_results.update({"allergen": {"$nin": allergens}})
+
+    diet = request.form.getlist("dietary_requirements")
+    if diet != []:
+        final_results.update({"dietary_requirement": {"$in": diet}})
+    
+    if final_results != {}:
+        recipes = list(mongo.db.recipes.find(final_results))
+        print(f"RECIPES: {recipes}")
+        print(final_results)
     else:
-        recipes = list(mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}}))
+        recipes = {}
+  
+    return render_template("filter_results.html", recipes=recipes, final_results=final_results)
 
-    return render_template("search.html", recipes=recipes)
+
+@app.route("/query_search", methods=['GET','POST'])
+def query_search():
+    
+    query = request.form.get("query")
+
+    if query:
+        starting_id = mongo.db.recipes.find({"$text": {"$search": query}})
+        recipe = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}})
+        if starting_id.count() > 0:
+            recipes = list(mongo.db.recipes.find({"$text": {"$search": query}}))
+        elif recipe.count() > 0:
+            recipes = list(mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}}))
+            # Alternative syntax
+            # recipes = list(mongo.db.recipes.find({'ingredient.ingredient_name': query}))
+        else:
+            recipes = []
+
+    return render_template("query_search.html", recipes=recipes, query=query)
 
 
 @app.route("/by_country")
 def by_country():
-    countries = sorted(mongo.db.countries.find(), key=lambda x: x['country'])
+    # countries = sorted(mongo.db.countries.find(), key=lambda x: x['country'])
+    countries = mongo.db.countries.find().sort("country", 1)
     recipes = list(mongo.db.recipes.find())
 
     return render_template("by_country.html", recipes=recipes, countries=countries)
@@ -271,7 +337,6 @@ def add_recipe():
     calories = mongo.db.calories.find()
     dietary_requirements = mongo.db.dietary_requirements.find()
     allergens = mongo.db.allergens.find()
-    countries = mongo.db.countries.find().sort("country", 1)
     servings = mongo.db.servings.find()
     return render_template("add_recipe.html", meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
 

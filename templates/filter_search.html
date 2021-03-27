@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <h3 class="center-align custom-margin">Apply Your Filters:</h3>
+
+    <!--Filter form -->
+    <div class="row yellow accent-4 form-container custom-margin padding-top">
+        <form class="col s12" method="POST" action="{{ url_for('filter_results') }}">
+            <div class="row">
+                <!--Meal type-->
+                <div class="input-field col s12 m4">
+                    <select id="meal_types" name="meal_types" class="validate" >
+                        <option value="" disabled selected>Meal type</option>
+                        {% for meal_type in meal_types %}
+                            {% if meal_type != "None" %}
+                                <!--The value is what will be sent to the server(Database), the content is what is displayed-->
+                                <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <label for="meal_types">Meal type</label>
+                </div>
+                <!--Difficulty-->
+                <div class="input-field col s12 m4">
+                    <select id="difficulties" name="difficulties" class="validate">
+                        <option value="" disabled selected>Difficulty</option>
+                        {% for difficulty in difficulties %}
+                            <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="difficulties">Difficulty</label>
+                </div>
+                <!--Prep time-->
+                <div class="input-field col s12 m4">
+                    <select id="prep_times" name="prep_times" class="validate">
+                        <option value="" disabled selected>Prep time</option>
+                        {% for prep_time in prep_times %}
+                            <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="prep_times">Prep time</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <!--Calories-->
+                <div class="input-field col s12 m4">
+                    <select id="calories" name="calories" class="validate">
+                        <option value="" disabled selected>Calories</option>
+                        {% for calorie_amount in calories %}
+                            <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="calories">Calories</label>
+                </div>
+                <!--Dietary requirements-->
+                <div class="input-field col s12 m4">
+                    <select id="dietary_requirements" name="dietary_requirements" class="validate" multiple>
+                        <option value="" disabled>Dietary requirements</option>
+                        {% for dietary_requirement in dietary_requirements %}
+                            {% if dietary_requirement != "None" %}
+                                <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <label for="dietary_requirements">Dietary requirements</label>
+                </div>
+                <!--Allergens-->
+                <div class="input-field col s12 m4">
+                    <select id="allergens" name="allergens" class="validate" multiple>
+                        <option value="" disabled>Allergens</option>
+                        {% for allergen in allergens %}
+                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="allergens">Allergens</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <!--Country-->
+                <div class="input-field col s12 m4">
+                    <select id="countries" name="countries" class="validate">
+                        <option value="" disabled selected>Available countries</option>
+                        {% for country in countries %}
+                            <option value="{{ country.country }}">{{ country.country.capitalize() }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="countries">Country</label>
+                </div>
+                <!--High protein checkbox-->
+                <div class="input-field col s12 m4">
+                    <p>
+                    <label>
+                        <input type="checkbox" id="is_high_protein" name="is_high_protein" />
+                        <span class="black-color" disabled>High protein</span>
+                    </label>
+                    </p>
+                </div>
+                <div class="input-field col s12 m4">
+                    <a href="{{ url_for('get_recipes') }}" class="waves-effect waves-green btn-small red cancel-btn">Cancel</a>
+                    <button type="submit" class="waves-effect waves-green btn-small light-green darken-2 apply-btn">Apply</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

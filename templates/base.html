@@ -20,7 +20,7 @@
                 <a href="{{ url_for('get_recipes') }}" class="brand-logo">Recipe <span class="vegan-color">Cookbook</span></a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
-                    <li><a href="collapsible.html">Dashboard</a></li>
+                    <li><a href="">Dashboard</a></li>
                     {% if session.user_session %}
                         <li><a href="{{ url_for('profile', username=session['user_session']) }}">Profile</a></li>
                         <li><a href="{{ url_for('logout') }}">Log Out</a></li>

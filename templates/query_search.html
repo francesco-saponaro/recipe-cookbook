@@ -8,19 +8,20 @@
                 <!--url_for will call the specified function's url which in turn will call the function-->
                 <a href="{{ url_for('add_recipe') }}" class="add-filter-btn waves-effect waves-light btn-large yellow accent-4">Add recipe</a>
             {% endif %}
-            <a class="add-filter-btn filter-btn waves-effect waves-light btn-large yellow accent-4">Filter</a>
         </div>
     </div>
 
-    <h3 class="center-align home-header">Recipes</h3>
+    {% if recipes|length > 0 %}
+        <h3 class="center-align home-header bottom-margin">Recipes with "{{ query }}"</h3>
+    {% endif %}
     
     <div class="row card-panel yellow accent-4">
-        <form action="{{ url_for('search') }}" method="post" class="col s12">
+        <form action="{{ url_for('query_search') }}" method="post" class="col s12">
             <div class="row valign-wrapper center-align">
                 <div class="input-field col s12 m8">
                     <i class="fas fa-search prefix light-green-text darken-2"></i>
                     <input type="text" name="query" id="query" minlength="3" class="validate" required>
-                    <label for="query">Search Recipe</label>
+                    <label for="query">Search Recipe by Name or Ingredient...</label>
                 </div>
                 <div class="col s12 m4">
                     <a href="{{ url_for('get_recipes') }}" class="red btn text-shadow">Reset</a>
@@ -32,8 +33,13 @@
         </form>
     </div>
     
-    <!--Recipe panel-->
     {% if recipes|length > 0 %}
+        <div class="row">
+            <div class="col s12">
+                <p class="bold larger country-margin">{{ recipes|length }} recipes found:</p>
+            </div>
+        </div>
+        <!--Recipe panel-->
         {% for recipe in recipes %}
             <div class="row">
                 <div class="col s12 m10 offset-m1">
@@ -64,7 +70,7 @@
                                     <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
                                     </div>
                                     <div class="modal-footer yellow accent-4">
-                                    <a href="{{ url_for('get_recipes') }}" class="modal-close waves-effect waves-green btn-small red">Cancel</a>
+                                    <a class="modal-close waves-effect waves-green btn-small red">Cancel</a>
                                     <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument  -->
                                     <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
                                     </div>
@@ -77,7 +83,7 @@
         {% endfor %}
 
     {% else %}
-        <h3 class="red-text text-darken-4 center-align">No Results Found</h3>
+        <h3 class="red-text text-darken-4 center-align">No Results Found for "{{ query }}"</h3>
     {% endif %}
         
 {% endblock %}

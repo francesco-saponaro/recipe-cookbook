@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <h3 class="recipe-title center-align">Add Recipe</h3>
+    <h3 class="recipe-title center-align bottom-margin">Add Recipe</h3>
 
     <div class="form-container row yellow accent-4">
         
@@ -125,7 +125,7 @@
                 <div class="row">
                     <!--Ingredient name-->
                     <div class="input-field col s12 m4">
-                        <input id="ingredient_name" name="ingredient_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The ingredient name can only contain alphabetic characters, apostrophe and whitespace. The ingredient name can only start with a alphabetic character" required>
+                        <input id="ingredient_name" name="ingredient_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s\-']+$" title="The ingredient name can only contain alphabetic characters, apostrophe and whitespace. The ingredient name can only start with a alphabetic character" required>
                         <label for="ingredient_name">Name</label>
                     </div>
                     <!--Ingredient quantity-->
@@ -168,7 +168,7 @@
             <div class="row">
                 <!--Recipe picture URL-->
                 <div class="col s12 center-align">
-                    <p class="black-color">Add a URL for your recipe dish picture (Optional)</p>
+                    <p class="black-color no-bottom-margin">Add a URL for your recipe dish picture (Optional)</p>
                     <input class="center-align validate" type="text" name="recipe_image_url" title="The URL must end with the with any of the following formats: jpg/gif/png" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
                 </div>
             </div>
