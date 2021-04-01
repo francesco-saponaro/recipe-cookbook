@@ -39,7 +39,7 @@
                 <div class="card-panel recipe-panel yellow accent-4">
                     <div class="col s9">
                         <!--Recipe name-->
-                        <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
+                        <p class="no-bottom-margin"><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
                         <!--Recipe high protein icon-->
                         {% if recipe.is_high_protein == "on" %}
                             <i class="fas fa-dumbbell fa-lg protein-icon"></i>
@@ -49,6 +49,23 @@
                             <i class="fas fa-leaf fa-lg vg-icon"></i>
                         {% endif %}
                         </p>
+                        {% if session.user_session %}
+                            <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
+                                {% if session_user_id in recipe.user_like %}
+                                    <button class="like-btn">
+                                        <input type="hidden" class="check-favourite" name="check-favourite" value="true">
+                                        <i class="like-icon fas fa-heart"></i>
+                                    </button>
+                                    <span>{{ recipe.user_likes }} likes</span>
+                                {% else %}
+                                    <button class="like-btn">
+                                        <input type="hidden" class="check-favourite" name="check-favourite" value="false">
+                                        <i class="like-icon far fa-heart"></i>
+                                    </button>
+                                    <span>{{ recipe.user_likes }} likes</span>
+                                {% endif %}
+                            </form>
+                        {% endif %}
                     </div>
                     <div class="col s3">
                         {% if session.user_session|lower == recipe.created_by|lower %}

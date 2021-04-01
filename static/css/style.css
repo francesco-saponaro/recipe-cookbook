@@ -139,6 +139,28 @@ input:-webkit-autofill:active
     padding-left: 10px;
 }
 
+.like-form-margin {
+    margin: 5px 0;
+}
+
+.like-icon {
+    color: red;
+}
+
+.like-text {
+    color:red;
+}
+
+.like-btn {
+    background-color: transparent;
+    border: none;
+}
+
+.like-btn:focus {
+    outline: none;
+    background-color: transparent;
+}
+
 .modal .modal-content {
     padding: 24px 48px;
 }

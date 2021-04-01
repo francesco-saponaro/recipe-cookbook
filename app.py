@@ -43,7 +43,10 @@ def get_recipes():
     allergens = mongo.db.allergens.find()
     countries = mongo.db.countries.find().sort("country", 1)
 
-    return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, countries=countries)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times,calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, countries=countries, session_user_id=session_user_id)
 
 @app.route("/filter_search", methods=['GET','POST'])
 def filter_search():
@@ -93,8 +96,11 @@ def filter_results():
         print(final_results)
     else:
         recipes = {}
+
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
   
-    return render_template("filter_results.html", recipes=recipes, final_results=final_results)
+    return render_template("filter_results.html", recipes=recipes, final_results=final_results, session_user_id=session_user_id)
 
 
 @app.route("/query_search", methods=['GET','POST'])
@@ -114,7 +120,10 @@ def query_search():
         else:
             recipes = []
 
-    return render_template("query_search.html", recipes=recipes, query=query)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("query_search.html", recipes=recipes, query=query, session_user_id=session_user_id)
 
 
 @app.route("/by_country")
@@ -123,7 +132,10 @@ def by_country():
     countries = mongo.db.countries.find().sort("country", 1)
     recipes = list(mongo.db.recipes.find())
 
-    return render_template("by_country.html", recipes=recipes, countries=countries)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("by_country.html", recipes=recipes, countries=countries, session_user_id=session_user_id)
 
 
 @app.route("/starters")
@@ -131,7 +143,10 @@ def starters():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    return render_template("starters.html", recipes=recipes, meal_types=meal_types)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("starters.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
 
 
 @app.route("/lunch")
@@ -139,7 +154,10 @@ def lunch():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    return render_template("lunch.html", recipes=recipes, meal_types=meal_types)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("lunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
 
 
 @app.route("/brunch")
@@ -147,7 +165,10 @@ def brunch():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    return render_template("brunch.html", recipes=recipes, meal_types=meal_types)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("brunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
 
 
 @app.route("/dinner")
@@ -155,21 +176,31 @@ def dinner():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    return render_template("dinner.html", recipes=recipes, meal_types=meal_types)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("dinner.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
 
 
 @app.route("/desserts")
 def desserts():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
-    return render_template("desserts.html", recipes=recipes, meal_types=meal_types)
+
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("desserts.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
 
 
 @app.route("/vegan")
 def vegan():
     recipes = list(mongo.db.recipes.find())
 
-    return render_template("vegan.html", recipes=recipes)
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
+    return render_template("vegan.html", recipes=recipes, session_user_id=session_user_id)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -251,9 +282,14 @@ def profile(username):
     next_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset + limit)
     prev_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset - limit) 
 
+
+    all_recipes = mongo.db.recipes.find()
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+
     # Defensive programming
     if session["user_session"]:
-        return render_template("profile.html", username=username, recipes=recipes, user_recipes=user_recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes)
+        return render_template("profile.html", username=username, recipes=recipes, user_recipes=user_recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, all_recipes=all_recipes, session_user_id=session_user_id)
 
     # If not logged in redirect to log in page
     return redirect(url_for("login"))
@@ -421,7 +457,11 @@ def edit_recipe(recipe_id):
 @app.route("/recipe_page/<recipe_id>")
 def recipe_page(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    return render_template("recipe_page.html", recipe=recipe)
+
+    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+    session_user_id = str(session_user["_id"])
+    
+    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
 
 
 @app.route("/delete_recipe/<recipe_id>")
@@ -435,7 +475,39 @@ def delete_recipe(recipe_id):
     return redirect(url_for("get_recipes"))
 
 
+@app.route("/like_recipe/<recipe_id>", methods=["GET", "POST"])
+def like_recipe(recipe_id):
+    if request.method == "POST":
+        if session["user_session"]:
+            session_user = mongo.db.users.find_one({"username": session["user_session"]})
+            session_user_id = str(session_user["_id"])
+            check_favourite = request.form.get("check-favourite")
+            if check_favourite == "true":
+                if ObjectId(recipe_id) not in session_user["liked_recipe"]:
+                    mongo.db.users.update({"username": session["user_session"]},
+                                          {"$push": {"liked_recipe": ObjectId(recipe_id)}})
+                    mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                                            {"$push": {"user_like": session_user_id}})
+                    mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                                            {"$inc": {"user_likes": 1}})
+                    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
 
+                    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
+
+            elif check_favourite == "false":
+                if ObjectId(recipe_id) in session_user["liked_recipe"]:
+                    mongo.db.users.update({"username": session["user_session"]},
+                                          {"$pull": {"liked_recipe": ObjectId(recipe_id)}})
+                    mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                                            {"$pull": {"user_like": session_user_id}})
+                    mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                                            {"$inc": {"user_likes": -1}})
+
+                    return redirect(url_for("get_recipes"))
+
+    return redirect(url_for("get_recipes"))
+
+   
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
             port=int(os.environ.get("PORT")),

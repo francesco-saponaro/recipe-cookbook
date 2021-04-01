@@ -56,6 +56,23 @@
                                 <i class="fas fa-leaf fa-lg vg-icon"></i>
                             {% endif %}
                             </p>
+                            {% if session.user_session %}
+                                <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
+                                    {% if session_user_id in recipe.user_like %}
+                                        <button class="like-btn">
+                                            <input type="hidden" class="check-favourite" name="check-favourite" value="true">
+                                            <i class="like-icon fas fa-heart"></i>
+                                        </button>
+                                        <span>{{ recipe.user_likes }} likes</span>
+                                    {% else %}
+                                        <button class="like-btn">
+                                            <input type="hidden" class="check-favourite" name="check-favourite" value="false">
+                                            <i class="like-icon far fa-heart"></i>
+                                        </button>
+                                        <span>{{ recipe.user_likes }} likes</span>
+                                    {% endif %}
+                                </form>
+                            {% endif %}
                         </div>
                         <div class="col s3">
                             {% if session.user_session|lower == recipe.created_by|lower %}
