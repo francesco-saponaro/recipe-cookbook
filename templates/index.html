@@ -56,13 +56,17 @@
                                         <input type="hidden" class="check-favourite" name="check-favourite" value="true">
                                         <i class="like-icon fas fa-heart"></i>
                                     </button>
-                                    <span>{{ recipe.user_likes }} likes</span>
+                                    <span>{{ recipe.user_likes }}</span>
+                                    <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                    <span>{{ recipe.comments_count }}</span>
                                 {% else %}
                                     <button class="like-btn">
                                         <input type="hidden" class="check-favourite" name="check-favourite" value="false">
                                         <i class="like-icon far fa-heart"></i>
                                     </button>
-                                    <span>{{ recipe.user_likes }} likes</span>
+                                    <span>{{ recipe.user_likes }}</span>
+                                    <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                    <span>{{ recipe.comments_count }}</span>
                                 {% endif %}
                             </form>
                         {% endif %}

@@ -24,6 +24,27 @@
                                     <i class="fas fa-leaf fa-lg vg-icon"></i>
                                 {% endif %}
                                 </p>
+                                {% if session.user_session %}
+                                    <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
+                                        {% if session_user_id in recipe.user_like %}
+                                            <button class="like-btn">
+                                                <input type="hidden" class="check-favourite" name="check-favourite" value="true">
+                                                <i class="like-icon fas fa-heart"></i>
+                                            </button>
+                                            <span>{{ recipe.user_likes }}</span>
+                                            <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                            <span>{{ recipe.comments_count }}</span>
+                                        {% else %}
+                                            <button class="like-btn">
+                                                <input type="hidden" class="check-favourite" name="check-favourite" value="false">
+                                                <i class="like-icon far fa-heart"></i>
+                                            </button>
+                                            <span>{{ recipe.user_likes }}</span>
+                                            <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                            <span>{{ recipe.comments_count }}</span>
+                                        {% endif %}
+                                    </form>
+                                {% endif %}
                             </div>
                             <div class="col s3">
                                 <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->
@@ -88,7 +109,9 @@
                                     <input type="hidden" class="check-favourite" name="check-favourite" value="true">
                                     <i class="like-icon fas fa-heart"></i>
                                 </button>
-                                <span>{{ recipe.user_likes }} likes</span>
+                                <span>{{ recipe.user_likes }}</span>
+                                <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                <span>{{ recipe.comments_count }}</span>
                             </form>
 
                         </div>

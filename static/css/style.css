@@ -161,6 +161,10 @@ input:-webkit-autofill:active
     background-color: transparent;
 }
 
+.comment-margin {
+    margin-left:15px;
+}
+
 .modal .modal-content {
     padding: 24px 48px;
 }

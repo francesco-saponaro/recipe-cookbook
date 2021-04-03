@@ -341,6 +341,10 @@ def add_recipe():
             "ingredient": ingredients,
             "description": request.form.get("description"),
             "recipe_image_url": request.form.get("recipe_image_url"),
+            "user_like": [],
+            "user_likes": int(0),
+            "comments": [],
+            "comments_count": int(0),
             # Grab this value from user in session
             "created_by": session["user_session"]
         }
@@ -399,6 +403,12 @@ def edit_recipe(recipe_id):
             # Append all dictionaries to ingredients list, which in turn will be passed inside the submit dictionary
             ingredients.append(ingredientdict)
 
+        recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+        user_like = recipe["user_like"]
+        user_likes = recipe["user_likes"]
+        comments = recipe["comments"]
+        comments_count = recipe["comments_count"]
+
         # Create the dictionary to be inserted in the mongodb "recipe" collection
         submit = {
             # Grab all values through the form's "name" parameter
@@ -415,6 +425,10 @@ def edit_recipe(recipe_id):
             "ingredient": ingredients,
             "description": request.form.get("description"),
             "recipe_image_url": request.form.get("recipe_image_url"),
+            "user_like": user_like,
+            "user_likes": user_likes,
+            "comments": comments,
+            "comments_count": comments_count,
             # Grab this value from logged in user
             "created_by": session["user_session"]
         }
@@ -439,9 +453,9 @@ def edit_recipe(recipe_id):
         flash("Recipe successfully updated")
         # Redirect to home page once recipe updated
         return redirect(url_for("get_recipes"))
-
-    # Grab the recipe through it's "_id" value to populate form's select fields
+    
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+
     # Grab all collections to populate form's select fields
     meal_types = mongo.db.meal_types.find()
     difficulties = mongo.db.difficulties.find()
@@ -457,11 +471,12 @@ def edit_recipe(recipe_id):
 @app.route("/recipe_page/<recipe_id>")
 def recipe_page(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    users = mongo.db.users.find()
 
     session_user = mongo.db.users.find_one({"username": session["user_session"]})
     session_user_id = str(session_user["_id"])
     
-    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
+    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id, session_user=session_user, users=users)
 
 
 @app.route("/delete_recipe/<recipe_id>")
@@ -470,6 +485,11 @@ def delete_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     # Delete current recipe
     mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
+    mongo.db.users.update_many({},
+                               {"$pull": {"liked_recipe": ObjectId(recipe_id)}})
+    mongo.db.users.update_many({},
+                               {"$pull": {"user_comments": {"recipe_id": ObjectId(recipe_id)}}})
+
 
     flash("Recipe successfully deleted")
     return redirect(url_for("get_recipes"))
@@ -506,6 +526,27 @@ def like_recipe(recipe_id):
                     return redirect(url_for("get_recipes"))
 
     return redirect(url_for("get_recipes"))
+
+
+@app.route("/comments/<recipe_id>", methods=["GET", "POST"])
+def comments(recipe_id):
+    if request.method == "POST":
+        if session["user_session"]:
+            session_user = mongo.db.users.find_one({"username": session["user_session"]})
+            session_user_id = str(session_user["_id"])
+            comment = request.form.get("comment")
+        
+            mongo.db.users.update({"username": session["user_session"]},
+                                  {"$push": {"user_comments": {"recipe_id": ObjectId(recipe_id), "comment": comment}}})
+            mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                                    {"$push": {"comments": [comment, session_user["username"]]}})
+            mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                                    {"$inc": {"comments_count": 1}})
+            recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+
+            return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
+
+    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id, session_user=session_user)
 
    
 if __name__ == "__main__":
