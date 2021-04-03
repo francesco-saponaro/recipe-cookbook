@@ -2,11 +2,15 @@
 {% block content %}
 
     <h3 class="center-align">{{ username|capitalize }}'s profile</h3>
-    <h3 class="custom-margin center-align">Your recipes:</h3>
+    <h4 class="custom-margin center-align">Your recipes:</h4>
 
     <!--User's recipe panels-->
-    {% if user_recipes|length > 0 %}
-        {% for recipe in recipes %}
+
+    {{ pagination.info }}
+    {{ pagination.links }}
+
+    {% if recipe_page|length > 0 %}
+        {% for recipe in recipe_page %}
             <!--Display recipes if created by the user-->
             {% if session.user_session|lower == recipe.created_by|lower %}
                 <div class="row">
@@ -69,76 +73,65 @@
                 </div>
             {% endif %}
         {% endfor %}
-
-        <div class="row">
-            <div class="col s12">
-            {% if offset > 0 %}
-                <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
-            {% endif %}
-            {% if (offset + 5) < total_recipes %}
-                <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4 right-float">next</a>
-            {% endif %}
-            </div>
-        </div>
         
     {% else %}
         <h3 class="red-text text-darken-4 center-align">No Recipes Uploaded Yet</h3>
     {% endif %}
 
-    <h3 class="custom-margin center-align">Your favourite recipes:</h3>
-    {% for recipe in all_recipes %}
-        {% if session_user_id in recipe.user_like %}
-            <div class="row">
-                <div class="col s12 m10 offset-m1">
-                    <div class="card-panel recipe-panel yellow accent-4">
-                        <div class="col s9">
-                            <!--Recipe name-->
-                            <p class="no-bottom-margin"><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
-                            <!--Recipe high protein icon-->
-                            {% if recipe.is_high_protein == "on" %}
-                                <i class="fas fa-dumbbell fa-lg protein-icon"></i>
-                            {% endif %}
-                            <!--Recipe vegan icon-->
-                            {% if 'Vegan' in recipe.dietary_requirement %}
-                                <i class="fas fa-leaf fa-lg vg-icon"></i>
-                            {% endif %}
-                            </p>
 
-                            <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
-                                <button class="like-btn">
-                                    <input type="hidden" class="check-favourite" name="check-favourite" value="true">
-                                    <i class="like-icon fas fa-heart"></i>
-                                </button>
-                                <span>{{ recipe.user_likes }}</span>
-                                <span class="comment-margin"><i class="far fa-comments"></i></span>
-                                <span>{{ recipe.comments_count }}</span>
-                            </form>
+    <h4 class="custom-margin center-align">Your favourite recipes:</h4>
 
-                        </div>
-                        <div class="col s3">
-                            {% if session.user_session|lower == recipe.created_by|lower %}
-                                <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument  -->
-                                <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
+    {% for recipe in liked_recipes %}
+        <div class="row">
+            <div class="col s12 m10 offset-m1">
+                <div class="card-panel recipe-panel yellow accent-4">
+                    <div class="col s9">
+                        <!--Recipe name-->
+                        <p class="no-bottom-margin"><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
+                        <!--Recipe high protein icon-->
+                        {% if recipe.is_high_protein == "on" %}
+                            <i class="fas fa-dumbbell fa-lg protein-icon"></i>
+                        {% endif %}
+                        <!--Recipe vegan icon-->
+                        {% if 'Vegan' in recipe.dietary_requirement %}
+                            <i class="fas fa-leaf fa-lg vg-icon"></i>
+                        {% endif %}
+                        </p>
 
-                                <!-- Delete confimation Modal Trigger -->
-                                <a class="red recipe-buttons btn-small modal-trigger" href="#modal{{ loop.index }}">Delete</a>
-                                <!-- Modal Structure -->
-                                <div id="modal{{ loop.index }}" class="modal yellow accent-4">
-                                    <div class="modal-content">
-                                    <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
-                                    </div>
-                                    <div class="modal-footer yellow accent-4">
-                                    <a class="modal-close waves-effect waves-green btn-small red">Cancel</a>
-                                    <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument  -->
-                                    <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
-                                    </div>
+                        <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
+                            <button class="like-btn">
+                                <input type="hidden" class="check-favourite" name="check-favourite" value="true">
+                                <i class="like-icon fas fa-heart"></i>
+                            </button>
+                            <span>{{ recipe.user_likes }}</span>
+                            <span class="comment-margin"><i class="far fa-comments"></i></span>
+                            <span>{{ recipe.comments_count }}</span>
+                        </form>
+
+                    </div>
+                    <div class="col s3">
+                        {% if session.user_session|lower == recipe.created_by|lower %}
+                            <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument  -->
+                            <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small recipes-buttons light-green darken-2">Edit</a>
+
+                            <!-- Delete confimation Modal Trigger -->
+                            <a class="red recipe-buttons btn-small modal-trigger" href="#modal{{ loop.index }}">Delete</a>
+                            <!-- Modal Structure -->
+                            <div id="modal{{ loop.index }}" class="modal yellow accent-4">
+                                <div class="modal-content">
+                                <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
                                 </div>
-                            {% endif %}
-                        </div>
+                                <div class="modal-footer yellow accent-4">
+                                <a class="modal-close waves-effect waves-green btn-small red">Cancel</a>
+                                <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument  -->
+                                <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        {% endif %}
+        </div>
     {% endfor %}
 
 {% endblock %}

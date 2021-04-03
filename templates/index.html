@@ -32,8 +32,11 @@
         </form>
     </div>
     
+    {{ pagination.info }}
+    {{ pagination.links }}
+
     <!--Recipe panel-->
-    {% for recipe in recipes %}
+    {% for recipe in recipe_page %}
         <div class="row">
             <div class="col s12 m10 offset-m1">
                 <div class="card-panel recipe-panel yellow accent-4">
@@ -95,17 +98,7 @@
             </div>
         </div>
     {% endfor %}
-
-    <div class="row">
-        <div class="col s12">
-        {% if offset > 0 %}
-            <a href="{{ prev_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4">prev</a>
-        {% endif %}
-        {% if (offset + 5) < total_recipes %}
-            <a href="{{ next_url }}" class="prev-next-btn waves-effect waves-light btn-large yellow accent-4 right-float">next</a>
-        {% endif %}
-        </div>
-    </div>
     
+    {{ pagination.links }}
     
 {% endblock %}

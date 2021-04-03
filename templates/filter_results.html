@@ -15,18 +15,17 @@
     <h3 class="center-align home-header">Results Filtered by:</h3>
     <ul class="custom-margin">
         {% for result in final_results %}
-                <li class="recipe-li bold larger margin-center green-text darken-4">{{ result.capitalize()|replace("_", " ") }} : {{ final_results[result].capitalize()|replace("[", "")|replace("]", "")|replace("'", "")|replace("{$nin: ", "")|replace("{$in: ", "")|replace("}", "") }}</li>
+                <li class="recipe-li bold larger margin-center green-text darken-4">{{ result.capitalize()|replace("_", " ") }} : {{ final_results[result]|replace("[", "")|replace("]", "")|replace("'", "")|replace("{$nin: ", "")|replace("{$in: ", "")|replace("}", "") }}</li>
         {% endfor %}
     </ul>
 
-    {% if recipes|length > 0 %}
-        <div class="row">
-            <div class="col s12">
-                <p class="bold larger country-margin">{{ recipes|length }} recipes found:</p>
-            </div>
-        </div>
+    {% if recipe_page|length > 0 %}
+
+        {{ pagination.info }}
+        {{ pagination.links }}
+        
          <!--Recipe panel-->
-        {% for recipe in recipes %}
+        {% for recipe in recipe_page %}
             <div class="row">
                 <div class="col s12 m10 offset-m1">
                     <div class="card-panel recipe-panel yellow accent-4">
@@ -88,6 +87,8 @@
                 </div>
             </div>
         {% endfor %}
+
+        {{ pagination.links }}
 
     {% else %}
         <h3 class="red-text text-darken-4 center-align">No Results Found</h3>

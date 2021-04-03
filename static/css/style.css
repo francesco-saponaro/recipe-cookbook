@@ -259,3 +259,23 @@ h3 span {
     margin-left: 40px;
     margin-bottom: 15px;
 }
+
+.pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+}
+.pagination-page-info b {
+    color: black;
+    background: #ffd600;
+    padding-left: 2px;
+    padding: .1em .25em;
+    font-size: 150%;
+}
+
+.pagination li.active {
+    background-color: #ffd600;
+}

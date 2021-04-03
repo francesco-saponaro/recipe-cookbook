@@ -2,6 +2,7 @@ import os
 from flask import (
     Flask, flash, render_template, redirect, request, session, url_for)
 from flask_pymongo import PyMongo, pymongo
+from flask_paginate import Pagination
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 if os.path.exists("env.py"):
@@ -19,21 +20,15 @@ mongo = PyMongo(app)
 @app.route("/")
 @app.route("/get_recipes")
 def get_recipes():
-    offset = 0
-    limit = 5
-
-    if "limit" in request.args:
-        limit = int(request.args.get("limit"))
-        offset = int(request.args.get("offset"))
-
-    total_recipes = mongo.db.recipes.count()
-    starting_id = mongo.db.recipes.find()
-    last_id = starting_id[offset]['_id']
-
-    recipes = mongo.db.recipes.find({'_id' : {'$gte' : last_id}}).limit(limit)
-
-    next_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset + limit)
-    prev_url = '/get_recipes?limit=' + str(limit) + '&offset=' + str(offset - limit) 
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find().sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     meal_types = mongo.db.meal_types.find()
     difficulties = mongo.db.difficulties.find()
@@ -47,10 +42,10 @@ def get_recipes():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times,calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
+        return render_template("index.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
         countries=countries, session_user_id=session_user_id)
     else:
-        return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times,calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
+        return render_template("index.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
         countries=countries)
 
 
@@ -70,7 +65,6 @@ def filter_search():
 
 @app.route("/filter_results", methods=['GET','POST'])
 def filter_results():
-
     recipe = {
         "meal_type": request.form.get("meal_types"),
         "difficulty": request.form.get("difficulties"),
@@ -103,13 +97,23 @@ def filter_results():
     else:
         recipes = {}
 
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find(final_results).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
+
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
     
-        return render_template("filter_results.html", recipes=recipes, final_results=final_results, session_user_id=session_user_id)
+        return render_template("filter_results.html", recipe_page=recipe_page, pagination=pagination, final_results=final_results,session_user_id=session_user_id)
     else:
-        return render_template("filter_results.html", recipes=recipes, final_results=final_results)
+        return render_template("filter_results.html", recipe_page=recipe_page, pagination=pagination, final_results=final_results)
 
 
 
@@ -122,21 +126,31 @@ def query_search():
         starting_id = mongo.db.recipes.find({"$text": {"$search": query}})
         recipe = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}})
         if starting_id.count() > 0:
-            recipes = list(mongo.db.recipes.find({"$text": {"$search": query}}))
+            recipes = mongo.db.recipes.find({"$text": {"$search": query}}).sort('user_likes', -1)
         elif recipe.count() > 0:
-            recipes = list(mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}}))
+            recipes = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}}).sort('user_likes', -1)
             # Alternative syntax
             # recipes = list(mongo.db.recipes.find({'ingredient.ingredient_name': query}))
         else:
-            recipes = []
+            flash(f'No results found for "{query}"')
+            return redirect(url_for("get_recipes"))
+
+    page = request.args.get('page', 1, type=int) 
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("query_search.html", recipes=recipes, query=query, session_user_id=session_user_id)
+        return render_template("query_search.html", recipe_page=recipe_page, pagination=pagination, recipes=recipes, query=query, session_user_id=session_user_id)
     else:
-        return render_template("query_search.html", recipes=recipes, query=query)
+        return render_template("query_search.html", recipe_page=recipe_page, pagination=pagination, recipes=recipes, query=query)
 
 
 
@@ -158,88 +172,142 @@ def by_country():
 @app.route("/starters")
 def starters():
     meal_types = mongo.db.meal_types.find()
-    recipes = list(mongo.db.recipes.find())
+    
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"meal_type": "Starter"}).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("starters.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("starters.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("starters.html", recipes=recipes, meal_types=meal_types)
+        return render_template("starters.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
 
 
 @app.route("/lunch")
 def lunch():
     meal_types = mongo.db.meal_types.find()
-    recipes = list(mongo.db.recipes.find())
+
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"meal_type": "Lunch"}).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("lunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("lunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("lunch.html", recipes=recipes, meal_types=meal_types)
+        return render_template("lunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/brunch")
 def brunch():
     meal_types = mongo.db.meal_types.find()
-    recipes = list(mongo.db.recipes.find())
+
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"meal_type": "Brunch"}).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("brunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("brunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("brunch.html", recipes=recipes, meal_types=meal_types)
+        return render_template("brunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/dinner")
 def dinner():
     meal_types = mongo.db.meal_types.find()
-    recipes = list(mongo.db.recipes.find())
+    
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"meal_type": "Dinner"}).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("dinner.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("dinner.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("dinner.html", recipes=recipes, meal_types=meal_types)
+        return render_template("dinner.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/desserts")
 def desserts():
     meal_types = mongo.db.meal_types.find()
-    recipes = list(mongo.db.recipes.find())
+    
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"meal_type": "Dessert"}).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("desserts.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("desserts.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("desserts.html", recipes=recipes, meal_types=meal_types)
+        return render_template("desserts.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/vegan")
 def vegan():
-    recipes = list(mongo.db.recipes.find())
+
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"dietary_requirement": "Vegan"})
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("vegan.html", recipes=recipes, session_user_id=session_user_id)
+        return render_template("vegan.html", recipe_page=recipe_page, pagination=pagination, session_user_id=session_user_id)
     else:
-        return render_template("vegan.html", recipes=recipes)
+        return render_template("vegan.html", recipe_page=recipe_page, pagination=pagination)
 
 
 
@@ -303,35 +371,24 @@ def login():
 def profile(username):
     # Grab the session user's username from mongoDB, this will be the argument for our function and therefore our URL, we will use it to welcome the user to the application
     username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
-    # Grab the recipes from mongodb "recipes" collection to populate the page
-    recipe = mongo.db.recipes
-    total_recipes = mongo.db.recipes.count()
-
-    offset = 0
-    limit = 5
-
-    if "limit" in request.args:
-        limit = int(request.args.get("limit"))
-        offset = int(request.args.get("offset"))
-
-    starting_id = recipe.find()
-    last_id = starting_id[offset]['_id']
-
-    recipes = recipe.find({'_id' : {'$gte' : last_id}}).limit(limit)
-    user_recipes = list(mongo.db.recipes.find({"created_by": session["user_session"]}))
-
-
-    next_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset + limit)
-    prev_url = '/profile/<username>?limit=' + str(limit) + '&offset=' + str(offset - limit) 
-
-
-    all_recipes = mongo.db.recipes.find()
+    
+    page = request.args.get('page', 1, type=int) 
+    recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
+    pagination = Pagination(page=page, total=recipes.count(),
+                            record_name='recipes')
+    def paginate_list(query, page_number, per_page):
+        array = [item for item in query]
+        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
+        return paginated_array
+    recipe_page = paginate_list(recipes, page, 10)
+    
     session_user = mongo.db.users.find_one({"username": session["user_session"]})
     session_user_id = str(session_user["_id"])
+    liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
 
     # Defensive programming
     if session["user_session"]:
-        return render_template("profile.html", username=username, recipes=recipes, user_recipes=user_recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, all_recipes=all_recipes, session_user_id=session_user_id)
+        return render_template("profile.html", username=username, recipe_page=recipe_page, pagination=pagination, liked_recipes=liked_recipes, session_user_id=session_user_id)
 
     # If not logged in redirect to log in page
     return redirect(url_for("login"))
