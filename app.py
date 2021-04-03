@@ -43,10 +43,16 @@ def get_recipes():
     allergens = mongo.db.allergens.find()
     countries = mongo.db.countries.find().sort("country", 1)
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times,calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, countries=countries, session_user_id=session_user_id)
+        return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times,calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
+        countries=countries, session_user_id=session_user_id)
+    else:
+        return render_template("index.html", recipes=recipes, next_url=next_url, prev_url=prev_url, offset=offset, total_recipes=total_recipes, starting_id=starting_id, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times,calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
+        countries=countries)
+
 
 @app.route("/filter_search", methods=['GET','POST'])
 def filter_search():
@@ -97,10 +103,14 @@ def filter_results():
     else:
         recipes = {}
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
-  
-    return render_template("filter_results.html", recipes=recipes, final_results=final_results, session_user_id=session_user_id)
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
+    
+        return render_template("filter_results.html", recipes=recipes, final_results=final_results, session_user_id=session_user_id)
+    else:
+        return render_template("filter_results.html", recipes=recipes, final_results=final_results)
+
 
 
 @app.route("/query_search", methods=['GET','POST'])
@@ -120,10 +130,14 @@ def query_search():
         else:
             recipes = []
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("query_search.html", recipes=recipes, query=query, session_user_id=session_user_id)
+        return render_template("query_search.html", recipes=recipes, query=query, session_user_id=session_user_id)
+    else:
+        return render_template("query_search.html", recipes=recipes, query=query)
+
 
 
 @app.route("/by_country")
@@ -132,10 +146,13 @@ def by_country():
     countries = mongo.db.countries.find().sort("country", 1)
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("by_country.html", recipes=recipes, countries=countries, session_user_id=session_user_id)
+        return render_template("by_country.html", recipes=recipes, countries=countries, session_user_id=session_user_id)
+    else:
+        return render_template("by_country.html", recipes=recipes, countries=countries)
 
 
 @app.route("/starters")
@@ -143,10 +160,13 @@ def starters():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("starters.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("starters.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+    else:
+        return render_template("starters.html", recipes=recipes, meal_types=meal_types)
 
 
 @app.route("/lunch")
@@ -154,10 +174,14 @@ def lunch():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("lunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("lunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+    else:
+        return render_template("lunch.html", recipes=recipes, meal_types=meal_types)
+
 
 
 @app.route("/brunch")
@@ -165,10 +189,14 @@ def brunch():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("brunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("brunch.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+    else:
+        return render_template("brunch.html", recipes=recipes, meal_types=meal_types)
+
 
 
 @app.route("/dinner")
@@ -176,10 +204,14 @@ def dinner():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("dinner.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("dinner.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+    else:
+        return render_template("dinner.html", recipes=recipes, meal_types=meal_types)
+
 
 
 @app.route("/desserts")
@@ -187,20 +219,28 @@ def desserts():
     meal_types = mongo.db.meal_types.find()
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("desserts.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("desserts.html", recipes=recipes, meal_types=meal_types, session_user_id=session_user_id)
+    else:
+        return render_template("desserts.html", recipes=recipes, meal_types=meal_types)
+
 
 
 @app.route("/vegan")
 def vegan():
     recipes = list(mongo.db.recipes.find())
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
 
-    return render_template("vegan.html", recipes=recipes, session_user_id=session_user_id)
+        return render_template("vegan.html", recipes=recipes, session_user_id=session_user_id)
+    else:
+        return render_template("vegan.html", recipes=recipes)
+
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -216,7 +256,9 @@ def register():
         # This acts as the else statement
         register = {
             "username": request.form.get("username").lower(),
-            "password": generate_password_hash(request.form.get("password"))
+            "password": generate_password_hash(request.form.get("password")),
+            "liked_recipe": [],
+            "user_comments": []
         }
         # Insert the dictionary in the "users" collection
         mongo.db.users.insert_one(register)
@@ -473,10 +515,14 @@ def recipe_page(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     users = mongo.db.users.find()
 
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
-    
-    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id, session_user=session_user, users=users)
+    if "user_session" in session:
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user_id = str(session_user["_id"])
+        
+        return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id, session_user=session_user, users=users)
+    else:
+        return render_template("recipe_page.html", recipe=recipe, users=users)
+
 
 
 @app.route("/delete_recipe/<recipe_id>")
