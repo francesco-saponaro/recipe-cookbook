@@ -6,7 +6,7 @@
     <div class="form-container row yellow accent-4">
 
         <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}">
-            <div class="row">
+            <div class="row small-margin">
                 <!--Recipe name-->
                 <div class="input-field col s12">
                     <input id="recipe_name" value="{{ recipe.recipe_name }}" name="recipe_name" type="text" class="validate" pattern="^[a-zA-Z][a-zA-Z\s\-']{3,40}$" title="The recipe name can only contain alphabetic characters, apostrophe and whitespace and needs to be between 3 and 30 characters long. The recipe name can only start with a alphabetic character" required>
@@ -14,7 +14,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row small-margin">
                 <!--Meal type-->
                 <div class="input-field col s12 m4">
                     <select id="meal_types" name="meal_types" class="validate" required>
@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row small-margin">
                 <!--Calories-->
                 <div class="input-field col s12 m4">
                     <select id="calories" name="calories" class="validate" required>
@@ -105,11 +105,6 @@
             </div>
 
             <div class="row">
-                <!--Country-->
-                <div class="input-field col s12 m4">
-                    <input id="countries" value="{{ recipe.country }}" name="countries" type="text" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The country name can only contain alphabetic characters, apostrophe and whitespace. The country name can only start with a alphabetic character">
-                    <label for="countries">Country</label>
-                </div>
                 <!--Servings-->
                 <div class="input-field col s12 m4">
                     <select id="servings" name="servings" class="validate" required>
@@ -124,8 +119,13 @@
                     </select>
                     <label for="servings">Servings</label>
                 </div>
+                <!--Country-->
+                <div class="input-field col s6 m4">
+                    <input id="countries" value="{{ recipe.country }}" name="countries" type="text" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The country name can only contain alphabetic characters, apostrophe and whitespace. The country name can only start with a alphabetic character">
+                    <label for="countries">Country</label>
+                </div>
                 <!--High protein checkbox-->
-                <div class="input-field col s12 m4">
+                <div class="input-field col s6 m4">
                     <p>
                     <label>
                         {% if recipe.is_high_protein == "on" %}
@@ -141,14 +141,14 @@
             </div>
 
             <div class="row">
-                <div class="col s6">
+                <div class="col s12 center-align">
                     <h5>Ingredients:</h5>
                 </div>
                 <!--Add and remove ingredient buttons-->
-                <div class="original-buttons input-field col s3">
+                <div class="input-field col s6">
                     <a onclick="addIng()" class="btn-floating btn-large waves-effect waves-light light-green darken-2 right"><i class="fas fa-plus"></i></a>
                  </div>
-                 <div class="original-buttons input-field col s3">
+                 <div class="input-field col s6">
                     <a onclick="removeIng()" class="btn-floating btn-large waves-effect waves-light red"><i class="fas fa-times right"></i></a>
                  </div>
             </div>
@@ -186,17 +186,19 @@
                 {% endfor %}
             </div>
 
-            <div class="row">
+            <div class="row no-bottom-margin">
                 <div class="col s12">
                     <h5>Method:</h5>
                 </div>
             </div>
+
+            <p class="no-top-margin">Describe the method<br><small>(Preferable format: "STEP1 Your Text. STEP2 Your Text." and so on...)</small></p>
             
             <div class="row">
                 <!--Method-->
                 <div class="input-field col s12">
-                <textarea id="description" name="description" class="materialize-textarea" minlength=50 title="The method description must be at least 50 characters long" required>{{ recipe.description }}</textarea>
-                <label for="description">Describe the method <span><small>(Preferable format: "STEP1 Your Text. STEP2 Your Text." and so on...)</small></span></label>
+                    <textarea id="description" name="description" class="materialize-textarea" minlength=50 title="The method description must be at least 50 characters long" required>{{ recipe.description }}</textarea>
+                    <label for="description"></label>
                 </div>
             </div>
 
