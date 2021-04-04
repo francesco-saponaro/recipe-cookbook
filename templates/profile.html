@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 
+    <!--Add and filter buttons-->
+    <div class="row add-filter-row">
+        <div class="col s12">
+            {% if session.user_session %}
+                <!--url_for will call the specified function's url which in turn will call the function-->
+                <a href="{{ url_for('add_recipe') }}" class="add-filter-btn waves-effect waves-light btn-large yellow accent-4">Add recipe</a>
+            {% endif %}
+        </div>
+    </div>
+    
     <h3 class="center-align">{{ username|capitalize }}'s profile</h3>
     <h4 class="custom-margin center-align">Your recipes:</h4>
 

@@ -10,6 +10,7 @@ if os.path.exists("env.py"):
 
 app = Flask(__name__)
 
+# Import Mongo, Mongo database and secret key from env.py
 app.config["MONGO_DBNAME"] = os.environ.get("MONGO_DBNAME")
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 app.secret_key = os.environ.get("SECRET_KEY")
@@ -17,9 +18,11 @@ app.secret_key = os.environ.get("SECRET_KEY")
 # Create instance of Pymongo with flask as argument
 mongo = PyMongo(app)
 
+# Home page
 @app.route("/")
 @app.route("/get_recipes")
 def get_recipes():
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find().sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -30,41 +33,43 @@ def get_recipes():
         return paginated_array
     recipe_page = paginate_list(recipes, page, 10)
 
-    meal_types = mongo.db.meal_types.find()
-    difficulties = mongo.db.difficulties.find()
-    prep_times = mongo.db.prep_times.find()
-    calories = mongo.db.calories.find()
-    dietary_requirements = mongo.db.dietary_requirements.find()
-    allergens = mongo.db.allergens.find()
-    countries = mongo.db.countries.find().sort("country", 1)
-
+    # Check if the user is logged in by checking if a session (cookie)
+    # has been created for it.
     if "user_session" in session:
+        # The ID of the user in session is needed in order to be added
+        # to a liked recipe. Only logged in users can like a recipe.
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("index.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
-        countries=countries, session_user_id=session_user_id)
+        return render_template("index.html", recipe_page=recipe_page, pagination=pagination, 
+                                session_user_id=session_user_id)
     else:
-        return render_template("index.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens,
-        countries=countries)
+        return render_template("index.html", recipe_page=recipe_page, pagination=pagination)
 
 
 @app.route("/filter_search", methods=['GET','POST'])
 def filter_search():
-    
+    # Grab collections from DB in order to populate filter fields
+    # Grab allergens and dietary requirements apart from the "None" documents
+    # as we dont want the user to filter by the "None" option.
     meal_types = mongo.db.meal_types.find()
     difficulties = mongo.db.difficulties.find()
     prep_times = mongo.db.prep_times.find()
     calories = mongo.db.calories.find()
-    dietary_requirements = mongo.db.dietary_requirements.find({"dietary_requirement": {"$nin": ["None"]}})
+    dietary_requirements = mongo.db.dietary_requirements.find({"dietary_requirement": 
+                                                              {"$nin": ["None"]}})
     allergens = mongo.db.allergens.find({"allergen": {"$nin": ["None"]}})
     countries = mongo.db.countries.find().sort("country", 1)
 
-    return render_template("filter_search.html", meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, countries=countries)
+    return render_template("filter_search.html", meal_types=meal_types, difficulties=difficulties, 
+    prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements,
+    allergens=allergens, countries=countries)
 
 
 @app.route("/filter_results", methods=['GET','POST'])
 def filter_results():
+    # Grab values from filter form aside from allergens and 
+    # dietary requirements which have a multiple option.
     recipe = {
         "meal_type": request.form.get("meal_types"),
         "difficulty": request.form.get("difficulties"),
@@ -74,29 +79,40 @@ def filter_results():
         "country": request.form.get("countries")
     }
 
+    # Add values to the final results object as long as
+    # a value has been chosen.
     final_results = {}
-
     for key, value in recipe.items():
         if value != None:
             final_results.update({key: value})
     print(final_results)
 
+    # If one or more allergens have been selected 
+    # from the list, add all non selected items in the list to the 
+    # final results object, as user will choose what they are 
+    # in fact allergic too and therefore cannot eat.
     allergens = request.form.getlist("allergens")
-
     if allergens != []:
         final_results.update({"allergen": {"$nin": allergens}})
 
+    # If one or more dietary_requirements have been selected 
+    # from the list, add them to the final results object. 
     diet = request.form.getlist("dietary_requirements")
     if diet != []:
         final_results.update({"dietary_requirement": {"$in": diet}})
     
+    # If final results object is not empty, as in if the user chose
+    # any option from any field to filter by, find a recipe that
+    # matches the final results object. Else redirect user to Home 
+    # page which contains all recipes, which is the same as not 
+    # filtering by anything.
     if final_results != {}:
         recipes = list(mongo.db.recipes.find(final_results))
-        print(f"RECIPES: {recipes}")
-        print(final_results)
     else:
-        recipes = {}
-
+        flash("No filters selected")
+        return redirect(url_for("get_recipes"))
+    
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find(final_results).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -111,32 +127,45 @@ def filter_results():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
     
-        return render_template("filter_results.html", recipe_page=recipe_page, pagination=pagination, final_results=final_results,session_user_id=session_user_id)
+        return render_template("filter_results.html", recipe_page=recipe_page,
+        pagination=pagination, final_results=final_results,session_user_id=session_user_id)
     else:
-        return render_template("filter_results.html", recipe_page=recipe_page, pagination=pagination, final_results=final_results)
+        return render_template("filter_results.html", recipe_page=recipe_page,
+        pagination=pagination, final_results=final_results)
 
 
 
 @app.route("/query_search", methods=['GET','POST'])
 def query_search():
-    
+    # Get value from the search query form, search index has been set up
+    # on the recipes collection to only find recipes by name or ingredients. 
     query = request.form.get("query")
 
     if query:
-        starting_id = mongo.db.recipes.find({"$text": {"$search": query}})
-        recipe = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}})
-        if starting_id.count() > 0:
-            recipes = mongo.db.recipes.find({"$text": {"$search": query}}).sort('user_likes', -1)
-        elif recipe.count() > 0:
-            recipes = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : {'ingredient_name': query}}}).sort('user_likes', -1)
-            # Alternative syntax
-            # recipes = list(mongo.db.recipes.find({'ingredient.ingredient_name': query}))
+        # Check if a user is searching a recipe name or an ingredient, $elemMatch
+        # is required for ingredients as ingredients are a nested object.
+        recipe_name = mongo.db.recipes.find({"$text": {"$search": query}})
+        ingredient = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : 
+                                                           {'ingredient_name': query}}})
+        # Find matching recipe by query depending on if its a recipe name
+        # or ingredient.
+        # Convert recipes variable to a list rather than a cursor, as an
+        # empty list is required in case no matches are found and I am unable
+        # to provide an empty cursor. It is required in order to 
+        # provide it to pagination.
+        if recipe_name.count() > 0:
+            recipes = list(mongo.db.recipes.find({"$text": {"$search": query}}).sort('user_likes', -1))
+        elif ingredient.count() > 0:
+            recipes = list(mongo.db.recipes.find({'ingredient' : {'$elemMatch' : 
+                                                                 {'ingredient_name': query}}}).sort('user_likes', -1))
+        # If no matching recipes found, set recipes to an empty list to prevent
+        # an error.
         else:
-            flash(f'No results found for "{query}"')
-            return redirect(url_for("get_recipes"))
+            recipes = []
 
+    # Pagination
     page = request.args.get('page', 1, type=int) 
-    pagination = Pagination(page=page, total=recipes.count(),
+    pagination = Pagination(page=page, total=len(recipes),
                             record_name='recipes')
     def paginate_list(query, page_number, per_page):
         array = [item for item in query]
@@ -148,15 +177,18 @@ def query_search():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("query_search.html", recipe_page=recipe_page, pagination=pagination, recipes=recipes, query=query, session_user_id=session_user_id)
+        return render_template("query_search.html", recipe_page=recipe_page,
+        pagination=pagination, recipes=recipes, query=query, session_user_id=session_user_id)
     else:
-        return render_template("query_search.html", recipe_page=recipe_page, pagination=pagination, recipes=recipes, query=query)
+        return render_template("query_search.html", recipe_page=recipe_page,
+        pagination=pagination, recipes=recipes, query=query)
 
 
 
 @app.route("/by_country")
 def by_country():
-    # countries = sorted(mongo.db.countries.find(), key=lambda x: x['country'])
+    # Get countries from their collection in ascending order, and 
+    # all recipes in order to populate page.
     countries = mongo.db.countries.find().sort("country", 1)
     recipes = list(mongo.db.recipes.find())
 
@@ -164,15 +196,18 @@ def by_country():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("by_country.html", recipes=recipes, countries=countries, session_user_id=session_user_id)
+        return render_template("by_country.html", recipes=recipes,
+        countries=countries, session_user_id=session_user_id)
     else:
-        return render_template("by_country.html", recipes=recipes, countries=countries)
+        return render_template("by_country.html", recipes=recipes,
+        countries=countries)
 
 
 @app.route("/starters")
 def starters():
+    # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
-    
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Starter"}).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -187,15 +222,18 @@ def starters():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("starters.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("starters.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("starters.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
+        return render_template("starters.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types)
 
 
 @app.route("/lunch")
 def lunch():
+    # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
-
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Lunch"}).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -210,16 +248,19 @@ def lunch():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("lunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("lunch.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("lunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
+        return render_template("lunch.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/brunch")
 def brunch():
+    # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
-
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Brunch"}).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -234,16 +275,19 @@ def brunch():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("brunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("brunch.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("brunch.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
+        return render_template("brunch.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/dinner")
 def dinner():
+    # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
-    
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Dinner"}).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -258,16 +302,19 @@ def dinner():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("dinner.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("dinner.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("dinner.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
+        return render_template("dinner.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/desserts")
 def desserts():
+    # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
-    
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Dessert"}).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -282,17 +329,21 @@ def desserts():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("desserts.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
+        return render_template("desserts.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types, session_user_id=session_user_id)
     else:
-        return render_template("desserts.html", recipe_page=recipe_page, pagination=pagination, meal_types=meal_types)
+        return render_template("desserts.html", recipe_page=recipe_page,
+        pagination=pagination, meal_types=meal_types)
 
 
 
 @app.route("/vegan")
 def vegan():
-
-    page = request.args.get('page', 1, type=int) 
+    # Get all recipes that have "Vegan" as a dietary requirement 
+    # in order to populate page.
     recipes = mongo.db.recipes.find({"dietary_requirement": "Vegan"})
+    # Pagination
+    page = request.args.get('page', 1, type=int) 
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
     def paginate_list(query, page_number, per_page):
@@ -305,35 +356,44 @@ def vegan():
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("vegan.html", recipe_page=recipe_page, pagination=pagination, session_user_id=session_user_id)
+        return render_template("vegan.html", recipe_page=recipe_page,
+        pagination=pagination, session_user_id=session_user_id)
     else:
-        return render_template("vegan.html", recipe_page=recipe_page, pagination=pagination)
+        return render_template("vegan.html", recipe_page=recipe_page,
+        pagination=pagination)
 
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    # Check if method is POST, which it will be once the 
+    # form has been sent successfully.
     if request.method == "POST":
         # Check if username already exist in database
-        existing_user = mongo.db.users.find_one({"username": request.form.get("username").lower()})
-
+        existing_user = mongo.db.users.find_one({"username": 
+                                                 request.form.get("username").lower()})
+        # If so reload page and let them know.
         if existing_user:
             flash("Username already exists")
             return redirect(url_for("register"))
-
-        # This acts as the else statement
+        # This acts as the else statement.
+        # Else add form details inside the register dictionary
+        # along with two empty lists needed to store the ID of a liked recipe
+        # and comments added.
+        # Password is hashed
         register = {
             "username": request.form.get("username").lower(),
             "password": generate_password_hash(request.form.get("password")),
             "liked_recipe": [],
             "user_comments": []
         }
-        # Insert the dictionary in the "users" collection
+        # Insert the dictionary in the "users" collection.
+        # Put the new user into a session cookie once registered.
+        # Let them know the registration was succesful and redirect
+        # them to the Home page.
         mongo.db.users.insert_one(register)
-        # Put the new user into a session cookie once registered
         session["user_session"] = request.form.get("username").lower()
         flash("Registration successful")
-        # Send user to home page once registered 
         return redirect(url_for("get_recipes"))
 
     # Default GET method if not POST
@@ -343,23 +403,22 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        # Check if username already exist in database
+        # Check if username already exist in database.
         existing_user = mongo.db.users.find_one({"username": request.form.get("username").lower()})
 
         if existing_user:
             # Check if the input password match the existing user password, if so start a session
+            # redirect them to Home page and welcome them.
             if check_password_hash(existing_user["password"], request.form.get("password")):
                 session["user_session"] = request.form.get("username").lower()
                 flash("Welcome, {}".format(request.form.get("username").capitalize()))
-                # Send user to home page once logged in
                 return redirect(url_for("get_recipes"))
+            # If invalid password match, redirect user to log in page
             else:
-                # If invalid password match, redirect user to log in page
                 flash("Incorrect username or password")
                 return redirect(url_for("login"))
-        
+        # If username doesn't exist, redirect to log in page
         else:
-            # Username doesn't exist, redirect to log in page
             flash("Incorrect username or password")
             return redirect(url_for("login"))
 
@@ -369,9 +428,10 @@ def login():
 
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
-    # Grab the session user's username from mongoDB, this will be the argument for our function and therefore our URL, we will use it to welcome the user to the application
+    # Grab the session user's username from mongoDB, this will be the argument 
+    # for our function and therefore our URL.
     username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
-    
+    # Pagination
     page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
     pagination = Pagination(page=page, total=recipes.count(),
@@ -384,11 +444,15 @@ def profile(username):
     
     session_user = mongo.db.users.find_one({"username": session["user_session"]})
     session_user_id = str(session_user["_id"])
+    # Find all recipes liked by the user through the user ID, which is added to the 
+    # recipes "user_like" field onclick.
+    # They will be needed to populate page with all liked recipes
     liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
 
     # Defensive programming
     if session["user_session"]:
-        return render_template("profile.html", username=username, recipe_page=recipe_page, pagination=pagination, liked_recipes=liked_recipes, session_user_id=session_user_id)
+        return render_template("profile.html", username=username, recipe_page=recipe_page,
+        pagination=pagination, liked_recipes=liked_recipes, session_user_id=session_user_id)
 
     # If not logged in redirect to log in page
     return redirect(url_for("login"))
@@ -396,7 +460,8 @@ def profile(username):
 
 @app.route("/logout")
 def logout():
-    # Remove user from session cookies
+    # Remove user from session cookies and redirect to 
+    # log in page.
     flash("You have been logged out")
     session.pop("user_session")
     return redirect(url_for("login"))
@@ -405,26 +470,28 @@ def logout():
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
     if request.method == "POST":
-
-        # Grab lists to populate list of dictionaries
+        # Grab all names, quantity and unit for each ingredient
+        # filled in form to be added in their own dictionary.
         names = request.form.getlist("ingredient_name")
         quantities = request.form.getlist("quantity")
         units = request.form.getlist("unit")
-        # Initialize ingredient list
+        # Initialize ingredients list to which add all ingredient dictionaries
         ingredients = []
         # Initialize ingredient dictionaries to go inside ingredients list
         ingredientdict = {}
-
-        # Iterate through the names list length and for each iteration create a dictionary containing the iteration of names, quantity and units
+        # Iterate by the names list length and for each iteration add into 
+        # a dictionary containing that iteration of names, quantity and units.
         for i in range(len(names)):
             ingredientdict = { "ingredient_name": names[i].lower(),
                                "quantity": quantities[i],
                                "unit": units[i]
                              }
-            # Append all dictionaries to ingredients list, which in turn will be passed inside the recipe dictionary
+            # Append each dictionary to ingredients list, which in turn 
+            # will be passed inside the recipe dictionary.
             ingredients.append(ingredientdict)
         
-        # Create the dictionary to be inserted in the mongodb "recipe" collection
+        # Dictionary with all values taken from form, 
+        # to be inserted in the mongodb "recipes" collection.
         recipe = {
             # Grab all values through the form's "name" parameter
             "recipe_name": request.form.get("recipe_name").lower(),
@@ -440,6 +507,7 @@ def add_recipe():
             "ingredient": ingredients,
             "description": request.form.get("description"),
             "recipe_image_url": request.form.get("recipe_image_url"),
+            # Empty lists and integers values to store user likes, comments and amounts
             "user_like": [],
             "user_likes": int(0),
             "comments": [],
@@ -448,25 +516,27 @@ def add_recipe():
             "created_by": session["user_session"]
         }
 
-        # Grab ingredients from form 
+        # Grab all added ingredient names from form 
         ingredient_list = request.form.getlist("ingredient_name")
-        # Loop through ingredients in form and for each, if not already in database, add them to it the ingredients collection
+        # Loop through ingredients in form and for each, if not already in ingredients
+        # collection, add them to it.
         for ingredient in ingredient_list:
             existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": ingredient.lower()})
             if not existing_ingredient:
                 mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
+        # Check if country already exist in database and if not already in database, and 
+        # country field is not empty, grab country from form and insert it (in lowercase) in the mongodb 
+        # "countries" collection.
         country = request.form.get("countries")
-        # Check if country already exist in database
         existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
-        # If country is not already in database, grab country from form and insert it (in lowercase) in the mongodb "countries" collection
         if not existing_country and country != "":
             mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
 
-        # Insert dictionary in in the mongodb "recipes" collection
+        # Insert recipe dictionary in in the mongodb "recipes" collection and
+        # redirect to home page once recipe submitted.
         mongo.db.recipes.insert_one(recipe)
         flash("Recipe successfully added")
-        # Redirect to home page once recipe submitted
         return redirect(url_for("get_recipes"))
 
     # Grab all collections to populate form's select fields
@@ -477,40 +547,45 @@ def add_recipe():
     dietary_requirements = mongo.db.dietary_requirements.find()
     allergens = mongo.db.allergens.find()
     servings = mongo.db.servings.find()
-    return render_template("add_recipe.html", meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
+    return render_template("add_recipe.html", meal_types=meal_types, difficulties=difficulties,
+    prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements,
+    allergens=allergens, servings=servings)
 
 
 @app.route("/edit_recipe/<recipe_id>", methods=["GET", "POST"])
 def edit_recipe(recipe_id):
     if request.method == "POST":
-
-        # Grab lists to populate list of dictionaries
+        # Grab all names, quantity and unit for each ingredient
+        # filled in form to be added in their own dictionary.
         names = request.form.getlist("ingredient_name")
         quantities = request.form.getlist("quantity")
         units = request.form.getlist("unit")
-        # Initialize ingredient list
+        # Initialize ingredients list to which add all ingredient dictionaries
         ingredients = []
         # Initialize ingredient dictionaries to go inside ingredients list
         ingredientdict = {}
-
-        # Iterate through the names list length and for each iteration create a dictionary containing the iteration of names, quantity and units
+        # Iterate by the names list length and for each iteration add into 
+        # a dictionary containing that iteration of names, quantity and units.
         for i in range(len(names)):
             ingredientdict = { "ingredient_name": names[i].lower(),
                                "quantity": quantities[i],
                                "unit": units[i]
                              }
-            # Append all dictionaries to ingredients list, which in turn will be passed inside the submit dictionary
+            # Append each dictionary to ingredients list, which in turn 
+            # will be passed inside the recipe dictionary.
             ingredients.append(ingredientdict)
 
+        # Get this non editable values from original recipe, in order to be added in 
+        # the submit (edited) dictionary.
         recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
         user_like = recipe["user_like"]
         user_likes = recipe["user_likes"]
         comments = recipe["comments"]
         comments_count = recipe["comments_count"]
 
-        # Create the dictionary to be inserted in the mongodb "recipe" collection
+        # Dictionary with all values taken from form, plus non editable
+        # values, to be inserted in the mongodb "recipes" collection.
         submit = {
-            # Grab all values through the form's "name" parameter
             "recipe_name": request.form.get("recipe_name").lower(),
             "meal_type": request.form.get("meal_types"),
             "difficulty": request.form.get("difficulties"),
@@ -532,22 +607,27 @@ def edit_recipe(recipe_id):
             "created_by": session["user_session"]
         }
 
-        # Grab ingredients from form 
+        # Grab all added ingredient names from form 
         ingredient_list = request.form.getlist("ingredient_name")
-        # Loop through ingredients in form and for each, if not already in database, add them to it the ingredients collection
+        # Loop through ingredients in form and for each, if not already in ingredients
+        # collection, add them to it.
         for ingredient in ingredient_list:
-            existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": ingredient.lower()})
+            existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": 
+                                                                ingredient.lower()})
             if not existing_ingredient:
                 mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
+        # Check if country already exist in database and if not already in database, and 
+        # country field is not empty, grab country from form and insert it (in lowercase) in the mongodb 
+        # "countries" collection.
         country = request.form.get("countries")
-        # Check if country already exist in database
         existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
-        # If country is not already in database, grab country from form and insert it (in lowercase) in the mongodb "countries" collection
         if not existing_country and country != "":
             mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
 
-        # Update dictionary in mongodb database. "update" method takes two parameters, first is the dictionary to be updated and the second is the updated dictionary. We find the dictionary to be updated through the recipe.id coming from the route
+        # Update dictionary in mongodb database. "update" method takes two parameters, 
+        # first is the dictionary to be updated and the second is the updated dictionary.
+        # We find the dictionary to be updated through the recipe.id of the current recipe
         mongo.db.recipes.update({"_id":ObjectId(recipe_id)}, submit)
         flash("Recipe successfully updated")
         # Redirect to home page once recipe updated
@@ -564,11 +644,14 @@ def edit_recipe(recipe_id):
     allergens = mongo.db.allergens.find()
     countries = mongo.db.countries.find().sort("country", 1)
     servings = mongo.db.servings.find()
-    return render_template("edit_recipe.html", recipe=recipe, meal_types=meal_types, difficulties=difficulties, prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
+    return render_template("edit_recipe.html", recipe=recipe, meal_types=meal_types,
+    difficulties=difficulties, prep_times=prep_times, calories=calories,
+    dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
 
 
 @app.route("/recipe_page/<recipe_id>")
 def recipe_page(recipe_id):
+    # Grab current recipe to populate page
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     users = mongo.db.users.find()
 
@@ -576,35 +659,43 @@ def recipe_page(recipe_id):
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
         
-        return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id, session_user=session_user, users=users)
+        return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id,
+        session_user=session_user)
     else:
-        return render_template("recipe_page.html", recipe=recipe, users=users)
+        return render_template("recipe_page.html", recipe=recipe)
 
 
 
 @app.route("/delete_recipe/<recipe_id>")
 def delete_recipe(recipe_id):
-    # Grab the current recipe and remove it
+    # Grab the current recipe and delete it
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    # Delete current recipe
     mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
+    # Remove deleted recipe from users likes and comments fields, if any
     mongo.db.users.update_many({},
                                {"$pull": {"liked_recipe": ObjectId(recipe_id)}})
     mongo.db.users.update_many({},
                                {"$pull": {"user_comments": {"recipe_id": ObjectId(recipe_id)}}})
 
-
+    # Redirect user to Home page
     flash("Recipe successfully deleted")
     return redirect(url_for("get_recipes"))
 
 
 @app.route("/like_recipe/<recipe_id>", methods=["GET", "POST"])
 def like_recipe(recipe_id):
+    # Liking a recipe will be executed through a form
     if request.method == "POST":
         if session["user_session"]:
+            # The session user ID is to be added in liked recipe document
             session_user = mongo.db.users.find_one({"username": session["user_session"]})
             session_user_id = str(session_user["_id"])
+            # Grab value from form
             check_favourite = request.form.get("check-favourite")
+            # If value is true (like) and recipe ID is not already in user liked_recipe field,
+            # add the recipe ID in the user liked_recipe field, add the user ID in the
+            # recipe's user_like field, and increase recipe's user_likes field by 1.
+            # Redirect user to liked recipe page on each like
             if check_favourite == "true":
                 if ObjectId(recipe_id) not in session_user["liked_recipe"]:
                     mongo.db.users.update({"username": session["user_session"]},
@@ -617,6 +708,10 @@ def like_recipe(recipe_id):
 
                     return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
 
+            # If value is false (unlike) and recipe ID is in user liked_recipe field,
+            # remove the recipe ID in the user liked_recipe field, remove the user ID in the
+            # recipe's user_like field, and decrease recipe's user_likes field by 1.
+            # Redirect user to Home page on each unlike
             elif check_favourite == "false":
                 if ObjectId(recipe_id) in session_user["liked_recipe"]:
                     mongo.db.users.update({"username": session["user_session"]},
@@ -633,12 +728,18 @@ def like_recipe(recipe_id):
 
 @app.route("/comments/<recipe_id>", methods=["GET", "POST"])
 def comments(recipe_id):
+    # Commenting a recipe will be executed through a form
     if request.method == "POST":
         if session["user_session"]:
             session_user = mongo.db.users.find_one({"username": session["user_session"]})
-            session_user_id = str(session_user["_id"])
+
+            # Get comment from form 
+            # Add the commented recipe ID and the comment in the user's user_comments field
+            # in the form of a dictionary. Add the comment and user's username in the commented 
+            # recipe's comments field in the form of a list.
+            # Increase recipe's comments_count field by 1
+            # Redirect user to recipe page
             comment = request.form.get("comment")
-        
             mongo.db.users.update({"username": session["user_session"]},
                                   {"$push": {"user_comments": {"recipe_id": ObjectId(recipe_id), "comment": comment}}})
             mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
@@ -647,9 +748,9 @@ def comments(recipe_id):
                                     {"$inc": {"comments_count": 1}})
             recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
 
-            return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
+            return render_template("recipe_page.html", recipe=recipe)
 
-    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id, session_user=session_user)
+    return render_template("recipe_page.html", recipe=recipe)
 
    
 if __name__ == "__main__":
