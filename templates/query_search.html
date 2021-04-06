@@ -12,7 +12,7 @@
     </div>
    
     <div class="row card-panel yellow accent-4">
-        <form action="{{ url_for('query_search') }}" method="post" class="col s12">
+        <form action="{{ url_for('query_search') }}" method="GET" class="col s12">
             <div class="row center-align">
                 <div class="input-field col s12">
                     <i class="fas fa-search prefix light-green-text darken-2"></i>
@@ -29,12 +29,11 @@
         </form>
     </div>
 
-    {% if recipe_page|length > 0 %}
+    {% if recipe_page.count() > 0 %}
 
         <h3 class="center-align home-header bottom-margin">Recipes with "{{ query }}"</h3>
             
         {{ pagination.info }}
-        {{ pagination.links }}
 
         <!--Recipe panel-->
         {% for recipe in recipe_page %}
@@ -99,6 +98,8 @@
                 </div>
             </div>
         {% endfor %}
+
+        {{ pagination.links }}
 
     {% else %}
         <h3 class="red-text text-darken-4 center-align">No Results Found "{{ query }}"</h3>

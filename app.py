@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 if os.path.exists("env.py"):
     import env
 
+
 app = Flask(__name__)
 
 # Import Mongo, Mongo database and secret key from env.py
@@ -22,16 +23,23 @@ mongo = PyMongo(app)
 @app.route("/")
 @app.route("/get_recipes")
 def get_recipes():
-    # Pagination
-    page = request.args.get('page', 1, type=int) 
+    # Pagination:
+    # Grab recipes from collection sorted by likes
     recipes = mongo.db.recipes.find().sort('user_likes', -1)
+    # Set page variable needed for pagination
+    page = request.args.get('page', 1, type=int)
+    # Set amount of recipes to show per page
+    per_page = 10
+    # Set how many recipes to skip each page by multiplying,
+    # recipes per page per current page - 1
+    offset = per_page * (page - 1)
+    # Apply the per page limit and the offset to the recipes collection
+    recipe_page = recipes.skip(offset).limit(per_page)
+    # Pagination variable from Flask paginate, it holds the page variable,
+    # the length of whole recipe collection and the record name which,
+    # should be the name of whatever items are being paginated
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     # Check if the user is logged in by checking if a session (cookie)
     # has been created for it.
@@ -68,15 +76,21 @@ def filter_search():
 
 @app.route("/filter_results", methods=['GET','POST'])
 def filter_results():
-    # Grab values from filter form aside from allergens and 
+    # Get values from filter form aside from allergens and 
     # dietary requirements which have a multiple option.
+    # Get value from the search query form, search index has been set up
+    # on the recipes collection to only find recipes by name or ingredients. 
+    # You need to use method="GET" on the form so the form passes the query 
+    # into the args, and then in the route, use request.args.get("query") and 
+    # not request.form.get - so the query is gotten from the args, 
+    # and is kept when you browse pages.
     recipe = {
-        "meal_type": request.form.get("meal_types"),
-        "difficulty": request.form.get("difficulties"),
-        "prep_time": request.form.get("prep_times"),
-        "calorie_amount": request.form.get("calories"),
-        "is_high_protein": request.form.get("is_high_protein"),
-        "country": request.form.get("countries")
+        "meal_type": request.args.get("meal_types"),
+        "difficulty": request.args.get("difficulties"),
+        "prep_time": request.args.get("prep_times"),
+        "calorie_amount": request.args.get("calories"),
+        "is_high_protein": request.args.get("is_high_protein"),
+        "country": request.args.get("countries")
     }
 
     # Add values to the final results object as long as
@@ -91,13 +105,13 @@ def filter_results():
     # from the list, add all non selected items in the list to the 
     # final results object, as user will choose what they are 
     # in fact allergic too and therefore cannot eat.
-    allergens = request.form.getlist("allergens")
+    allergens = request.args.getlist("allergens")
     if allergens != []:
         final_results.update({"allergen": {"$nin": allergens}})
 
     # If one or more dietary_requirements have been selected 
     # from the list, add them to the final results object. 
-    diet = request.form.getlist("dietary_requirements")
+    diet = request.args.getlist("dietary_requirements")
     if diet != []:
         final_results.update({"dietary_requirement": {"$in": diet}})
     
@@ -113,15 +127,13 @@ def filter_results():
         return redirect(url_for("get_recipes"))
     
     # Pagination
-    page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find(final_results).sort('user_likes', -1)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -139,39 +151,34 @@ def filter_results():
 def query_search():
     # Get value from the search query form, search index has been set up
     # on the recipes collection to only find recipes by name or ingredients. 
-    query = request.form.get("query")
+    # You need to use method="GET" on the form so the form passes the query 
+    # into the args, and then in the route, use request.args.get("query") and 
+    # not request.form.get - so the query is gotten from the args, 
+    # and is kept when you browse pages.
+    query = request.args.get("query")
 
     if query:
-        # Check if a user is searching a recipe name or an ingredient, $elemMatch
-        # is required for ingredients as ingredients are a nested object.
+        # Check if a user is searching a recipe name or an ingredient
         recipe_name = mongo.db.recipes.find({"$text": {"$search": query}})
-        ingredient = mongo.db.recipes.find({'ingredient' : {'$elemMatch' : 
-                                                           {'ingredient_name': query}}})
+        ingredient = mongo.db.recipes.find({'ingredient.ingredient_name': {"$regex" : ".*" + query + ".*"}})
         # Find matching recipe by query depending on if its a recipe name
         # or ingredient.
-        # Convert recipes variable to a list rather than a cursor, as an
-        # empty list is required in case no matches are found and I am unable
-        # to provide an empty cursor. It is required in order to 
-        # provide it to pagination.
         if recipe_name.count() > 0:
-            recipes = list(mongo.db.recipes.find({"$text": {"$search": query}}).sort('user_likes', -1))
+            recipes = mongo.db.recipes.find({"$text": {"$search": query}}).sort('user_likes', -1)
         elif ingredient.count() > 0:
-            recipes = list(mongo.db.recipes.find({'ingredient' : {'$elemMatch' : 
-                                                                 {'ingredient_name': query}}}).sort('user_likes', -1))
-        # If no matching recipes found, set recipes to an empty list to prevent
-        # an error.
+            recipes = mongo.db.recipes.find({'ingredient.ingredient_name': {"$regex" : ".*" + query + ".*"}}).sort('user_likes', -1)
+        # If no matching recipes found, set recipes to an empty cursor to prevent
+        # an error, I am doing this by purposedly finding a non existent field
         else:
-            recipes = []
+            recipes = mongo.db.recipes.find({'meal_type': "Midnight snack"})
 
     # Pagination
-    page = request.args.get('page', 1, type=int) 
-    pagination = Pagination(page=page, total=len(recipes),
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
+    pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -208,15 +215,13 @@ def starters():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Starter"}).sort('user_likes', -1)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -234,15 +239,13 @@ def lunch():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Lunch"}).sort('user_likes', -1)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -261,15 +264,13 @@ def brunch():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Brunch"}).sort('user_likes', -1)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -288,15 +289,13 @@ def dinner():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Dinner"}).sort('user_likes', -1)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -315,16 +314,14 @@ def desserts():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    page = request.args.get('page', 1, type=int) 
     recipes = mongo.db.recipes.find({"meal_type": "Dessert"}).sort('user_likes', -1)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
-
+    
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
@@ -343,15 +340,13 @@ def vegan():
     # in order to populate page.
     recipes = mongo.db.recipes.find({"dietary_requirement": "Vegan"})
     # Pagination
-    page = request.args.get('page', 1, type=int) 
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = per_page * (page - 1)
+    recipe_page = recipes.skip(offset).limit(per_page)
     pagination = Pagination(page=page, total=recipes.count(),
                             record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
-
+   
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
@@ -428,34 +423,42 @@ def login():
 
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
-    # Grab the session user's username from mongoDB, this will be the argument 
-    # for our function and therefore our URL.
-    username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
-    # Pagination
-    page = request.args.get('page', 1, type=int) 
-    recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
-    pagination = Pagination(page=page, total=recipes.count(),
-                            record_name='recipes')
-    def paginate_list(query, page_number, per_page):
-        array = [item for item in query]
-        paginated_array = array[((page_number*per_page)-per_page):(page_number*per_page)]
-        return paginated_array
-    recipe_page = paginate_list(recipes, page, 10)
-    
-    session_user = mongo.db.users.find_one({"username": session["user_session"]})
-    session_user_id = str(session_user["_id"])
-    # Find all recipes liked by the user through the user ID, which is added to the 
-    # recipes "user_like" field onclick.
-    # They will be needed to populate page with all liked recipes
-    liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
+    # Check if a user is logged in
+    try:
+        # Check if the logged in user matches the url's username, this
+        # is to prevent other users copying other users url to access
+        # their profile.
+        # Defensive programming
+        if session["user_session"] == username:
+            # Grab the session user's username from mongoDB, this will be the argument 
+            # for our function and therefore our URL.
+            username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
+            # Pagination
+            recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
+            page = request.args.get('page', 1, type=int)
+            per_page = 10
+            offset = per_page * (page - 1)
+            recipe_page = recipes.skip(offset).limit(per_page)
+            pagination = Pagination(page=page, total=recipes.count(),
+                                    record_name='recipes')
 
-    # Defensive programming
-    if session["user_session"]:
-        return render_template("profile.html", username=username, recipe_page=recipe_page,
-        pagination=pagination, liked_recipes=liked_recipes, session_user_id=session_user_id)
+            session_user = mongo.db.users.find_one({"username": session["user_session"]})
+            session_user_id = str(session_user["_id"])
+            # Find all recipes liked by the user through the user ID, which is added to the 
+            # recipes "user_like" field onclick.
+            # They will be needed to populate page with all liked recipes
+            liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
 
-    # If not logged in redirect to log in page
-    return redirect(url_for("login"))
+
+            return render_template("profile.html", username=username, recipe_page=recipe_page,
+            pagination=pagination, liked_recipes=liked_recipes, session_user_id=session_user_id)
+        else:
+            return redirect(url_for("get_recipes"))
+    # If user not logged in run KeyError, which is raised when 
+    # a mapping (dictionary) key is not found in the set of existing keys.
+    # Redirect user to log in page
+    except KeyError:
+        return redirect(url_for("get_recipes"))
 
 
 @app.route("/logout")
@@ -469,191 +472,216 @@ def logout():
 
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
-    if request.method == "POST":
-        # Grab all names, quantity and unit for each ingredient
-        # filled in form to be added in their own dictionary.
-        names = request.form.getlist("ingredient_name")
-        quantities = request.form.getlist("quantity")
-        units = request.form.getlist("unit")
-        # Initialize ingredients list to which add all ingredient dictionaries
-        ingredients = []
-        # Initialize ingredient dictionaries to go inside ingredients list
-        ingredientdict = {}
-        # Iterate by the names list length and for each iteration add into 
-        # a dictionary containing that iteration of names, quantity and units.
-        for i in range(len(names)):
-            ingredientdict = { "ingredient_name": names[i].lower(),
-                               "quantity": quantities[i],
-                               "unit": units[i]
-                             }
-            # Append each dictionary to ingredients list, which in turn 
-            # will be passed inside the recipe dictionary.
-            ingredients.append(ingredientdict)
-        
-        # Dictionary with all values taken from form, 
-        # to be inserted in the mongodb "recipes" collection.
-        recipe = {
-            # Grab all values through the form's "name" parameter
-            "recipe_name": request.form.get("recipe_name").lower(),
-            "meal_type": request.form.get("meal_types"),
-            "difficulty": request.form.get("difficulties"),
-            "prep_time": request.form.get("prep_times"),
-            "calorie_amount": request.form.get("calories"),
-            "dietary_requirement": request.form.getlist("dietary_requirements"),
-            "allergen": request.form.getlist("allergens"),
-            "serving": request.form.get("servings"),
-            "is_high_protein": request.form.get("is_high_protein"),
-            "country": request.form.get("countries").lower(),
-            "ingredient": ingredients,
-            "description": request.form.get("description"),
-            "recipe_image_url": request.form.get("recipe_image_url"),
-            # Empty lists and integers values to store user likes, comments and amounts
-            "user_like": [],
-            "user_likes": int(0),
-            "comments": [],
-            "comments_count": int(0),
-            # Grab this value from user in session
-            "created_by": session["user_session"]
-        }
+    try:
+        # Defensive programming
+        if session["user_session"]:
+            if request.method == "POST":
+                # Grab all names, quantity and unit for each ingredient
+                # filled in form to be added in their own dictionary.
+                names = request.form.getlist("ingredient_name")
+                quantities = request.form.getlist("quantity")
+                units = request.form.getlist("unit")
+                # Initialize ingredients list to which add all ingredient dictionaries
+                ingredients = []
+                # Initialize ingredient dictionaries to go inside ingredients list
+                ingredientdict = {}
+                # Iterate by the names list length and for each iteration add into 
+                # a dictionary containing that iteration of names, quantity and units.
+                for i in range(len(names)):
+                    ingredientdict = { "ingredient_name": names[i].lower(),
+                                    "quantity": quantities[i],
+                                    "unit": units[i]
+                                    }
+                    # Append each dictionary to ingredients list, which in turn 
+                    # will be passed inside the recipe dictionary.
+                    ingredients.append(ingredientdict)
+                
+                # Dictionary with all values taken from form, 
+                # to be inserted in the mongodb "recipes" collection.
+                recipe = {
+                    # Grab all values through the form's "name" parameter
+                    "recipe_name": request.form.get("recipe_name").lower(),
+                    "meal_type": request.form.get("meal_types"),
+                    "difficulty": request.form.get("difficulties"),
+                    "prep_time": request.form.get("prep_times"),
+                    "calorie_amount": request.form.get("calories"),
+                    "dietary_requirement": request.form.getlist("dietary_requirements"),
+                    "allergen": request.form.getlist("allergens"),
+                    "serving": request.form.get("servings"),
+                    "is_high_protein": request.form.get("is_high_protein"),
+                    "country": request.form.get("countries").lower(),
+                    "ingredient": ingredients,
+                    "description": request.form.get("description"),
+                    "recipe_image_url": request.form.get("recipe_image_url"),
+                    # Empty lists and integers values to store user likes, comments and amounts
+                    "user_like": [],
+                    "user_likes": int(0),
+                    "comments": [],
+                    "comments_count": int(0),
+                    # Grab this value from user in session
+                    "created_by": session["user_session"]
+                }
 
-        # Grab all added ingredient names from form 
-        ingredient_list = request.form.getlist("ingredient_name")
-        # Loop through ingredients in form and for each, if not already in ingredients
-        # collection, add them to it.
-        for ingredient in ingredient_list:
-            existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": ingredient.lower()})
-            if not existing_ingredient:
-                mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
+                # Grab all added ingredient names from form 
+                ingredient_list = request.form.getlist("ingredient_name")
+                # Loop through ingredients in form and for each, if not already in ingredients
+                # collection, add them to it.
+                for ingredient in ingredient_list:
+                    existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": ingredient.lower()})
+                    if not existing_ingredient:
+                        mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
-        # Check if country already exist in database and if not already in database, and 
-        # country field is not empty, grab country from form and insert it (in lowercase) in the mongodb 
-        # "countries" collection.
-        country = request.form.get("countries")
-        existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
-        if not existing_country and country != "":
-            mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
+                # Check if country already exist in database and if not already in database, and 
+                # country field is not empty, grab country from form and insert it (in lowercase) in the mongodb 
+                # "countries" collection.
+                country = request.form.get("countries")
+                existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
+                if not existing_country and country != "":
+                    mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
 
-        # Insert recipe dictionary in in the mongodb "recipes" collection and
-        # redirect to home page once recipe submitted.
-        mongo.db.recipes.insert_one(recipe)
-        flash("Recipe successfully added")
+                # Insert recipe dictionary in in the mongodb "recipes" collection and
+                # redirect to home page once recipe submitted.
+                mongo.db.recipes.insert_one(recipe)
+                flash("Recipe successfully added")
+                return redirect(url_for("get_recipes"))
+
+            # Grab all collections to populate form's select fields
+            meal_types = mongo.db.meal_types.find()
+            difficulties = mongo.db.difficulties.find()
+            prep_times = mongo.db.prep_times.find()
+            calories = mongo.db.calories.find()
+            dietary_requirements = mongo.db.dietary_requirements.find()
+            allergens = mongo.db.allergens.find()
+            servings = mongo.db.servings.find()
+            return render_template("add_recipe.html", meal_types=meal_types, difficulties=difficulties,
+            prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements,
+            allergens=allergens, servings=servings)
+    # If user not logged in run KeyError, which is raised when 
+    # a mapping (dictionary) key is not found in the set of existing keys.
+    # Redirect user to log in page
+    except KeyError:
         return redirect(url_for("get_recipes"))
 
-    # Grab all collections to populate form's select fields
-    meal_types = mongo.db.meal_types.find()
-    difficulties = mongo.db.difficulties.find()
-    prep_times = mongo.db.prep_times.find()
-    calories = mongo.db.calories.find()
-    dietary_requirements = mongo.db.dietary_requirements.find()
-    allergens = mongo.db.allergens.find()
-    servings = mongo.db.servings.find()
-    return render_template("add_recipe.html", meal_types=meal_types, difficulties=difficulties,
-    prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements,
-    allergens=allergens, servings=servings)
 
 
 @app.route("/edit_recipe/<recipe_id>", methods=["GET", "POST"])
 def edit_recipe(recipe_id):
-    if request.method == "POST":
-        # Grab all names, quantity and unit for each ingredient
-        # filled in form to be added in their own dictionary.
-        names = request.form.getlist("ingredient_name")
-        quantities = request.form.getlist("quantity")
-        units = request.form.getlist("unit")
-        # Initialize ingredients list to which add all ingredient dictionaries
-        ingredients = []
-        # Initialize ingredient dictionaries to go inside ingredients list
-        ingredientdict = {}
-        # Iterate by the names list length and for each iteration add into 
-        # a dictionary containing that iteration of names, quantity and units.
-        for i in range(len(names)):
-            ingredientdict = { "ingredient_name": names[i].lower(),
-                               "quantity": quantities[i],
-                               "unit": units[i]
-                             }
-            # Append each dictionary to ingredients list, which in turn 
-            # will be passed inside the recipe dictionary.
-            ingredients.append(ingredientdict)
-
-        # Get this non editable values from original recipe, in order to be added in 
-        # the submit (edited) dictionary.
+    try:
+        # Grab current recipe and username of logged in user, and check
+        # if there a user logged in and if its username matches the
+        # "created_by" field of the recipe being edited. If so edit 
+        # recipe, else redirect to Home page
+        # Defensive programming
         recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-        user_like = recipe["user_like"]
-        user_likes = recipe["user_likes"]
-        comments = recipe["comments"]
-        comments_count = recipe["comments_count"]
+        username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
+        if session["user_session"] and username == recipe["created_by"]:
+            if request.method == "POST":
+                # Grab all names, quantity and unit for each ingredient
+                # filled in form to be added in their own dictionary.
+                names = request.form.getlist("ingredient_name")
+                quantities = request.form.getlist("quantity")
+                units = request.form.getlist("unit")
+                # Initialize ingredients list to which add all ingredient dictionaries
+                ingredients = []
+                # Initialize ingredient dictionaries to go inside ingredients list
+                ingredientdict = {}
+                # Iterate by the names list length and for each iteration add into 
+                # a dictionary containing that iteration of names, quantity and units.
+                for i in range(len(names)):
+                    ingredientdict = { "ingredient_name": names[i].lower(),
+                                    "quantity": quantities[i],
+                                    "unit": units[i]
+                                    }
+                    # Append each dictionary to ingredients list, which in turn 
+                    # will be passed inside the recipe dictionary.
+                    ingredients.append(ingredientdict)
 
-        # Dictionary with all values taken from form, plus non editable
-        # values, to be inserted in the mongodb "recipes" collection.
-        submit = {
-            "recipe_name": request.form.get("recipe_name").lower(),
-            "meal_type": request.form.get("meal_types"),
-            "difficulty": request.form.get("difficulties"),
-            "prep_time": request.form.get("prep_times"),
-            "calorie_amount": request.form.get("calories"),
-            "dietary_requirement": request.form.getlist("dietary_requirements"),
-            "allergen": request.form.getlist("allergens"),
-            "serving": request.form.get("servings"),
-            "is_high_protein": request.form.get("is_high_protein"),
-            "country": request.form.get("countries").lower(),
-            "ingredient": ingredients,
-            "description": request.form.get("description"),
-            "recipe_image_url": request.form.get("recipe_image_url"),
-            "user_like": user_like,
-            "user_likes": user_likes,
-            "comments": comments,
-            "comments_count": comments_count,
-            # Grab this value from logged in user
-            "created_by": session["user_session"]
-        }
+                # Get this non editable values from original recipe, in order to be added in 
+                # the submit (edited) dictionary.
+                recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+                user_like = recipe["user_like"]
+                user_likes = recipe["user_likes"]
+                comments = recipe["comments"]
+                comments_count = recipe["comments_count"]
 
-        # Grab all added ingredient names from form 
-        ingredient_list = request.form.getlist("ingredient_name")
-        # Loop through ingredients in form and for each, if not already in ingredients
-        # collection, add them to it.
-        for ingredient in ingredient_list:
-            existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": 
-                                                                ingredient.lower()})
-            if not existing_ingredient:
-                mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
+                # Dictionary with all values taken from form, plus non editable
+                # values, to be inserted in the mongodb "recipes" collection.
+                submit = {
+                    "recipe_name": request.form.get("recipe_name").lower(),
+                    "meal_type": request.form.get("meal_types"),
+                    "difficulty": request.form.get("difficulties"),
+                    "prep_time": request.form.get("prep_times"),
+                    "calorie_amount": request.form.get("calories"),
+                    "dietary_requirement": request.form.getlist("dietary_requirements"),
+                    "allergen": request.form.getlist("allergens"),
+                    "serving": request.form.get("servings"),
+                    "is_high_protein": request.form.get("is_high_protein"),
+                    "country": request.form.get("countries").lower(),
+                    "ingredient": ingredients,
+                    "description": request.form.get("description"),
+                    "recipe_image_url": request.form.get("recipe_image_url"),
+                    "user_like": user_like,
+                    "user_likes": user_likes,
+                    "comments": comments,
+                    "comments_count": comments_count,
+                    # Grab this value from logged in user
+                    "created_by": session["user_session"]
+                }
 
-        # Check if country already exist in database and if not already in database, and 
-        # country field is not empty, grab country from form and insert it (in lowercase) in the mongodb 
-        # "countries" collection.
-        country = request.form.get("countries")
-        existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
-        if not existing_country and country != "":
-            mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
+                # Grab all added ingredient names from form 
+                ingredient_list = request.form.getlist("ingredient_name")
+                # Loop through ingredients in form and for each, if not already in ingredients
+                # collection, add them to it.
+                for ingredient in ingredient_list:
+                    existing_ingredient = mongo.db.ingredients.find_one({"ingredient_name": 
+                                                                        ingredient.lower()})
+                    if not existing_ingredient:
+                        mongo.db.ingredients.insert_one({"ingredient_name": ingredient.lower()})
 
-        # Update dictionary in mongodb database. "update" method takes two parameters, 
-        # first is the dictionary to be updated and the second is the updated dictionary.
-        # We find the dictionary to be updated through the recipe.id of the current recipe
-        mongo.db.recipes.update({"_id":ObjectId(recipe_id)}, submit)
-        flash("Recipe successfully updated")
-        # Redirect to home page once recipe updated
+                # Check if country already exist in database and if not already in database, and 
+                # country field is not empty, grab country from form and insert it (in lowercase) in the mongodb 
+                # "countries" collection.
+                country = request.form.get("countries")
+                existing_country = mongo.db.countries.find_one({"country": request.form.get("countries").lower()})
+                if not existing_country and country != "":
+                    mongo.db.countries.insert_one({"country": request.form.get("countries").lower()})
+
+                # Update dictionary in mongodb database. "update" method takes two parameters, 
+                # first is the dictionary to be updated and the second is the updated dictionary.
+                # We find the dictionary to be updated through the recipe.id of the current recipe
+                mongo.db.recipes.update({"_id":ObjectId(recipe_id)}, submit)
+                flash("Recipe successfully updated")
+                # Redirect to home page once recipe updated
+                return redirect(url_for("get_recipes"))
+            
+            recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+
+            # Grab all collections to populate form's select fields
+            meal_types = mongo.db.meal_types.find()
+            difficulties = mongo.db.difficulties.find()
+            prep_times = mongo.db.prep_times.find()
+            calories = mongo.db.calories.find()
+            dietary_requirements = mongo.db.dietary_requirements.find()
+            allergens = mongo.db.allergens.find()
+            countries = mongo.db.countries.find().sort("country", 1)
+            servings = mongo.db.servings.find()
+            return render_template("edit_recipe.html", recipe=recipe, meal_types=meal_types,
+            difficulties=difficulties, prep_times=prep_times, calories=calories,
+            dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
+        else:
+            flash("You can only edit your own recipes")
+            return redirect(url_for("get_recipes"))
+    except KeyError:
+        flash("You need to be logged in to edit a recipe")
         return redirect(url_for("get_recipes"))
-    
-    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
 
-    # Grab all collections to populate form's select fields
-    meal_types = mongo.db.meal_types.find()
-    difficulties = mongo.db.difficulties.find()
-    prep_times = mongo.db.prep_times.find()
-    calories = mongo.db.calories.find()
-    dietary_requirements = mongo.db.dietary_requirements.find()
-    allergens = mongo.db.allergens.find()
-    countries = mongo.db.countries.find().sort("country", 1)
-    servings = mongo.db.servings.find()
-    return render_template("edit_recipe.html", recipe=recipe, meal_types=meal_types,
-    difficulties=difficulties, prep_times=prep_times, calories=calories,
-    dietary_requirements=dietary_requirements, allergens=allergens, servings=servings)
+
 
 
 @app.route("/recipe_page/<recipe_id>")
 def recipe_page(recipe_id):
     # Grab current recipe to populate page
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    users = mongo.db.users.find()
 
     if "user_session" in session:
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -686,6 +714,7 @@ def delete_recipe(recipe_id):
 def like_recipe(recipe_id):
     # Liking a recipe will be executed through a form
     if request.method == "POST":
+        # Defensive programming
         if session["user_session"]:
             # The session user ID is to be added in liked recipe document
             session_user = mongo.db.users.find_one({"username": session["user_session"]})
@@ -730,6 +759,7 @@ def like_recipe(recipe_id):
 def comments(recipe_id):
     # Commenting a recipe will be executed through a form
     if request.method == "POST":
+        # Defensive programming
         if session["user_session"]:
             session_user = mongo.db.users.find_one({"username": session["user_session"]})
 
@@ -752,6 +782,20 @@ def comments(recipe_id):
 
     return render_template("recipe_page.html", recipe=recipe)
 
+
+
+# error handler is a built in Flask function that returns a response 
+# when a type of error is raised
+# error 404
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('not_found.html', error=error), 404
+
+
+# error 500 
+@app.errorhandler(500)
+def internal_server_error(error):
+    return render_template('internal_error.html', error=error), 500
    
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),

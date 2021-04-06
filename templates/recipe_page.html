@@ -33,10 +33,17 @@
     <!--Recipe picture, if exists-->
     {% if recipe.recipe_image_url %}
         <div class="row">
-            <div class="col s12">
-                <img class="recipe-image" src="{{ recipe.recipe_image_url }}" alt="{{ recipe.recipe_image_name }}">
+            <div id="img-container" class="col s12">
+                <img id="recipe-img" class="recipe-image" src="{{ recipe.recipe_image_url }}" alt="{{ recipe.recipe_image_name }}">
             </div>
         </div>
+    {% else %}
+    <!--Placeholder image if no images uploaded-->
+        <div class="row">
+            <div class="col s12">
+                <img class="recipe-image" src="{{ url_for('static', filename='images/no-dish-img.png') }}" alt="No Image Uploaded">
+            </div>
+        </div>  
     {% endif %}
 
     <div class="form-container recipe-container row yellow accent-4 center-align">
@@ -170,5 +177,5 @@
         </div>
     {% endfor %}
     
-
+    <script src="{{ url_for('static', filename='js/wrong_img_url.js') }}"></script>
 {% endblock %}

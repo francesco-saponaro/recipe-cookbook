@@ -14,10 +14,9 @@
     <h3 class="center-align meal-type-header">"Dessert" Recipes</h3>
 
     {{ pagination.info }}
-    {{ pagination.links }}
     
     <!--Recipe panel-->
-    {% if recipe_page|length > 0 %}
+    {% if recipe_page.count() > 0 %}
         {% for recipe in recipe_page %}
             <div class="row">
                 <div class="col s12 m10 offset-m1">

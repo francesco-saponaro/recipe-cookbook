@@ -15,16 +15,15 @@
     <h3 class="center-align home-header">Results Filtered by:</h3>
     <ul class="custom-margin">
         {% for result in final_results %}
-                <li class="recipe-li bold larger margin-center green-text darken-4">{{ result.capitalize()|replace("_", " ") }} : {{ final_results[result]|replace("[", "")|replace("]", "")|replace("'", "")|replace("{$nin: ", "")|replace("{$in: ", "")|replace("}", "") }}</li>
+                <li class="recipe-li bold larger margin-center green-text darken-4">{{ result.capitalize()|replace("_", " ")|replace("Is", "") }} : {{ final_results[result]|replace("[", "")|replace("]", "")|replace("'", "")|replace("{$nin: ", "")|replace("{$in: ", "")|replace("}", "") }}</li>
         {% endfor %}
     </ul>
 
-    {% if recipe_page|length > 0 %}
+    {% if recipe_page.count() > 0 %}
 
         {{ pagination.info }}
-        {{ pagination.links }}
         
-         <!--Recipe panel-->
+        <!--Recipe panel-->
         {% for recipe in recipe_page %}
             <div class="row">
                 <div class="col s12 m10 offset-m1">
