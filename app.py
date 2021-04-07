@@ -25,7 +25,7 @@ mongo = PyMongo(app)
 def get_recipes():
     # Pagination:
     # Grab recipes from collection sorted by likes
-    recipes = mongo.db.recipes.find().sort('user_likes', -1)
+    recipes = mongo.db.recipes.find()
     # Set page variable needed for pagination
     page = request.args.get('page', 1, type=int)
     # Set amount of recipes to show per page
@@ -423,40 +423,69 @@ def login():
 
 @app.route("/profile/<username>", methods=["GET", "POST"])
 def profile(username):
+    your_recipes = request.args.get("your_recipes", None)
+    your_favourites = request.args.get("your_favourites", None)
+
     # Check if a user is logged in
+    # Defensive programming
     try:
-        # Check if the logged in user matches the url's username, this
-        # is to prevent other users copying other users url to access
-        # their profile.
-        # Defensive programming
         if session["user_session"] == username:
-            # Grab the session user's username from mongoDB, this will be the argument 
-            # for our function and therefore our URL.
-            username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
-            # Pagination
-            recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
-            page = request.args.get('page', 1, type=int)
-            per_page = 10
-            offset = per_page * (page - 1)
-            recipe_page = recipes.skip(offset).limit(per_page)
-            pagination = Pagination(page=page, total=recipes.count(),
-                                    record_name='recipes')
+            if your_recipes == "your_recipes":
+                # Check if the logged in user matches the url's username, this
+                # is to prevent other users copying other users url to access
+                # their profile.
+                # Defensive programming
+                if session["user_session"] == username:
+                    # Grab the session user's username from mongoDB to populate page header
+                    username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
+                    # Pagination
+                    # Grab all recipes created by the user to populate the page
+                    recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
+                    page = request.args.get('page', 1, type=int)
+                    per_page = 10
+                    offset = per_page * (page - 1)
+                    recipe_page = recipes.skip(offset).limit(per_page)
+                    pagination = Pagination(page=page, total=recipes.count(),
+                                            record_name='recipes')
 
-            session_user = mongo.db.users.find_one({"username": session["user_session"]})
-            session_user_id = str(session_user["_id"])
-            # Find all recipes liked by the user through the user ID, which is added to the 
-            # recipes "user_like" field onclick.
-            # They will be needed to populate page with all liked recipes
-            liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
+                    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+                    session_user_id = str(session_user["_id"])
 
+                    return render_template("profile.html", username=username, recipe_page=recipe_page,
+                    pagination=pagination, session_user_id=session_user_id, your_recipes=your_recipes)
+                else:
+                    return redirect(url_for("get_recipes"))
+                    
+            elif your_favourites == "your_favourites":
+                # Check if the logged in user matches the url's username, this
+                # is to prevent other users copying other users url to access
+                # their profile.
+                # Defensive programming
+                if session["user_session"] == username:
+                    session_user = mongo.db.users.find_one({"username": session["user_session"]})
+                    session_user_id = str(session_user["_id"])
+                    # Grab the session user's username from mongoDB to populate page header
+                    username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
+                    # Pagination
+                    # Find all recipes liked by the user through the user ID, which is added to the 
+                    # recipes "user_like" field onclick.
+                    # They will be needed to populate page with all liked recipes
+                    liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
+                    page = request.args.get('page', 1, type=int)
+                    per_page = 10
+                    offset = per_page * (page - 1)
+                    recipe_page = liked_recipes.skip(offset).limit(per_page)
+                    pagination = Pagination(page=page, total=liked_recipes.count(),
+                                            record_name='recipes')
 
-            return render_template("profile.html", username=username, recipe_page=recipe_page,
-            pagination=pagination, liked_recipes=liked_recipes, session_user_id=session_user_id)
+                    return render_template("profile.html", username=username, recipe_page=recipe_page,
+                    pagination=pagination, session_user_id=session_user_id, your_favourites=your_favourites)
+                else:
+                    return redirect(url_for("get_recipes"))
+            else:
+                return render_template("profile.html", username=username)
         else:
             return redirect(url_for("get_recipes"))
-    # If user not logged in run KeyError, which is raised when 
-    # a mapping (dictionary) key is not found in the set of existing keys.
-    # Redirect user to log in page
     except KeyError:
         return redirect(url_for("get_recipes"))
 

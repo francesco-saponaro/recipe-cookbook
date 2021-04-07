@@ -61,6 +61,10 @@ h4 {
     float:right;
 }
 
+.profile-margin {
+    margin-bottom:100px;
+}
+
 /* Colors */
 .vegan-color {
     color: #689f38;
@@ -219,6 +223,15 @@ label > span {
 .apply-btn {
     width:49%;
     float:right;
+}
+
+/* Profile page */
+.profile-panels {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:25px;
 }
 
 /* Recipe page */
