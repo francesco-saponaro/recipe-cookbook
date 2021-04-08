@@ -14,7 +14,7 @@
 
     <header>
         <!--Navigation-->
-        <nav class="yellow accent-4">
+        <nav class="main-background">
             <div class="nav-wrapper">
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="fas fa-bars"></i></a>
                 <a href="{{ url_for('get_recipes') }}" class="brand-logo">Recipe <span class="vegan-color">Cookbook</span></a>
@@ -46,7 +46,7 @@
         </nav>
         
         <!--Side menu-->
-        <ul class="sidenav" id="mobile-demo">
+        <ul class="sidenav main-background" id="mobile-demo">
             <li><h4 class="center-align">Recipe <span class="vegan-color">Cookbook</span></h4></li>
             <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
             <li><a href="{{ url_for('starters') }}">Starters</a></li>
@@ -73,7 +73,7 @@
             {% if messages %}
                 {% for message in messages %}
                     <div class="row center-align">
-                        <h4 class="light-green-text text-darken-2">{{ message }}</h4>
+                        <h4 class="main-color">{{ message }}</h4>
                     </div>
                 {% endfor %}
             {% endif %}

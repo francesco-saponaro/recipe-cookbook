@@ -1,40 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <!--Add and filter buttons-->
-    <div class="row add-filter-row">
-        <div class="col s12">
+    <div class="row">
+        <div class="col s12 center-align">
+            <h2 class="no-bottom-margin flex-self">{{ username|capitalize }}'s profile</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12 center-align">
             {% if session.user_session %}
                 <!--url_for will call the specified function's url which in turn will call the function-->
-                <a href="{{ url_for('add_recipe') }}" class="add-filter-btn waves-effect waves-light btn-large yellow accent-4">Add recipe</a>
+                <a href="{{ url_for('add_recipe') }}" class="add-filter-btn waves-effect waves-light btn-large"><span class="add-filter-title">Add recipe</span> <i class="fas fa-plus"></i></a>
             {% endif %}
         </div>
     </div>
 
-    <h3 class="center-align bottom-margin">{{ username|capitalize }}'s profile</h3>
-
     <div class="row">
-        <div class="col s12 m6">
-            <div class="card yellow accent-4 text-shadow center-align profile-panels">
-                <div class="card-content">
-                    <h4 class="custom-margin center-align">Your recipes</h4>
-                    {% if your_recipes != "your_recipes" %}
-                        <a href="{{ url_for('profile', username=session['user_session'], your_recipes='your_recipes') }}" class="btn light-green darken-2">Go to</a>
-                    {% endif %}
+        {% if your_recipes != "your_recipes" %}
+            <div class="col s12 m6">
+                <div class="card border-color center-align profile-panels">
+                    <div class="card-content">
+                            <a href="{{ url_for('profile', username=session['user_session'], your_recipes='your_recipes') }}" class="btn profile-btn-2">Your recipes</a>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% else %}
+            <div class="col s12 m6">
+                <div class="card main-background center-align profile-panels">
+                    <div class="card-content">
+                            <a href="{{ url_for('profile', username=session['user_session'], your_recipes='your_recipes') }}" class="btn profile-btn">Your recipes</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
-        <div class="col s12 m6">
-            <div class="card yellow accent-4 text-shadow center-align profile-panels">
-                <div class="card-content">
-                    <h4 class="custom-margin center-align">Your favourite recipes</h4>
-                    {% if your_favourites != "your_favourites" %}
-                        <a href="{{ url_for('profile', username=session['user_session'], your_favourites='your_favourites') }}" class="btn light-green darken-2">Go to</a>
-                    {% endif %}
+        {% if your_favourites != "your_favourites" %}
+            <div class="col s12 m6">
+                <div class="card border-color center-align profile-panels">
+                    <div class="card-content">
+                        <a href="{{ url_for('profile', username=session['user_session'], your_favourites='your_favourites') }}" class="btn profile-btn-2">Your favourite recipes</a>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% else %}
+            <div class="col s12 m6">
+                <div class="card main-background center-align profile-panels">
+                    <div class="card-content">
+                        <a href="{{ url_for('profile', username=session['user_session'], your_favourites='your_favourites') }}" class="btn profile-btn">Your favourite recipes</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
     {% if your_recipes == "your_recipes" %}
@@ -52,62 +69,68 @@
 
         {% if recipe_page.count() > 0 %}
 
-            {{ pagination.info }}
-
+            <div class="row">
+                <div class="col s12 m10 offset-m1 flex-col">
+                    {{ pagination.info }}
+                </div>
+            </div>
+            
             {% for recipe in recipe_page %}
                 <!--Display recipes if created by the user-->
                 <div class="row">
                     <div class="col s12 m10 offset-m1">
-                        <div class="card-panel recipe-panel yellow accent-4">
-                            <div class="col s8 m9">
+                        <div class="card-panel recipe-panel">
+                            <div class="col s8">
                                 <!--Recipe name-->
-                                <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
-                                <!--Recipe high protein icon-->
-                                {% if recipe.is_high_protein == "on" %}
-                                    <i class="fas fa-dumbbell fa-lg protein-icon"></i>
-                                {% endif %}
-                                <!--Recipe vegan icon-->
-                                {% if 'Vegan' in recipe.dietary_requirement %}
-                                    <i class="fas fa-leaf fa-lg vg-icon"></i>
-                                {% endif %}
-                                </p>
-                                {% if session.user_session %}
-                                    <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
-                                        {% if session_user_id in recipe.user_like %}
-                                            <button class="like-btn">
-                                                <input type="hidden" class="check-favourite" name="check-favourite" value="true">
-                                                <i class="like-icon fas fa-heart"></i>
-                                            </button>
-                                            <span>{{ recipe.user_likes }}</span>
-                                            <span class="comment-margin"><i class="far fa-comments"></i></span>
-                                            <span>{{ recipe.comments_count }}</span>
-                                        {% else %}
-                                            <button class="like-btn">
-                                                <input type="hidden" class="check-favourite" name="check-favourite" value="false">
-                                                <i class="like-icon far fa-heart"></i>
-                                            </button>
-                                            <span>{{ recipe.user_likes }}</span>
-                                            <span class="comment-margin"><i class="far fa-comments"></i></span>
-                                            <span>{{ recipe.comments_count }}</span>
-                                        {% endif %}
-                                    </form>
-                                {% endif %}
+                                <p class="no-bottom-margin no-top-margin"><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger no-top-margin no-bottom-margin">{{ recipe.recipe_name.capitalize() }}</a></p>
+                                <div class="recipe-details">
+                                    <em>uploaded by</em> : {{ recipe.created_by }}
+                                    <!--Recipe high protein icon-->
+                                    {% if recipe.is_high_protein == "on" %}
+                                        <i class="fas fa-dumbbell fa-sm protein-icon"></i>
+                                    {% endif %}
+                                    <!--Recipe vegan icon-->
+                                    {% if 'Vegan' in recipe.dietary_requirement %}
+                                        <i class="fas fa-leaf fa-sm vg-icon"></i>
+                                    {% endif %}
+                                    {% if session.user_session %}
+                                        <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id, current_page='profile') }}" method="POST">
+                                            {% if session_user_id in recipe.user_like %}
+                                                <button class="like-btn">
+                                                    <input type="hidden" class="check-favourite" name="check-favourite" value="true">
+                                                    <i class="like-icon fas fa-heart"></i>
+                                                </button>
+                                                <span>{{ recipe.user_likes }}</span>
+                                                <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                                <span>{{ recipe.comments_count }}</span>
+                                            {% else %}
+                                                <button class="like-btn">
+                                                    <input type="hidden" class="check-favourite" name="check-favourite" value="false">
+                                                    <i class="like-icon far fa-heart"></i>
+                                                </button>
+                                                <span>{{ recipe.user_likes }}</span>
+                                                <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                                <span>{{ recipe.comments_count }}</span>
+                                            {% endif %}
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="col s4 m3">
+                            <div class="col s4 center-align">
                                 {% if session.user_session|lower == recipe.created_by|lower %}
-                                    <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->
+                                    <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument  -->
                                     <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small edit-btn light-green darken-2">Edit</a>
 
                                     <!-- Delete confimation Modal Trigger -->
-                                    <a class="red btn-small modal-trigger" href="#modal1">Delete</a>
+                                    <a class="red btn-small delete-btn modal-trigger" href="#modal{{ loop.index }}">Delete</a>
                                     <!-- Modal Structure -->
-                                    <div id="modal1" class="modal yellow accent-4">
+                                    <div id="modal{{ loop.index }}" class="modal main-background white-text">
                                         <div class="modal-content">
-                                        <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
+                                        <h4 class="small-modal-text">Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
                                         </div>
-                                        <div class="modal-footer yellow accent-4">
-                                        <a href="{{ url_for('get_recipes') }}" class="modal-close waves-effect waves-green btn-small red">Cancel</a>
-                                        <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument-->
+                                        <div class="modal-footer">
+                                        <a class="modal-close waves-effect waves-green btn-small red">Cancel</a>
+                                        <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument  -->
                                         <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
                                         </div>
                                     </div>
@@ -118,7 +141,11 @@
                 </div>
             {% endfor %}
 
-        {{ pagination.links }}
+        <div class="row">
+            <div class="col s12 m10 offset-m1">
+                {{ pagination.links }}
+            </div>
+        </div>
         
         {% else %}
             <div class="row">
@@ -132,62 +159,68 @@
     
         {% if recipe_page.count() > 0 %}
 
-            {{ pagination.info }}
+            <div class="row">
+                <div class="col s12 m10 offset-m1 flex-col">
+                    {{ pagination.info }}
+                </div>
+            </div>
             
             {% for recipe in recipe_page %}
                 <!--Display recipes if created by the user-->
                 <div class="row">
                     <div class="col s12 m10 offset-m1">
-                        <div class="card-panel recipe-panel yellow accent-4">
-                            <div class="col s8 m9">
+                        <div class="card-panel recipe-panel">
+                            <div class="col s8">
                                 <!--Recipe name-->
-                                <p><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger custom-margin">{{ recipe.recipe_name.capitalize() }}</a> - <em>uploaded by:</em> {{ recipe.created_by }}
-                                <!--Recipe high protein icon-->
-                                {% if recipe.is_high_protein == "on" %}
-                                    <i class="fas fa-dumbbell fa-lg protein-icon"></i>
-                                {% endif %}
-                                <!--Recipe vegan icon-->
-                                {% if 'Vegan' in recipe.dietary_requirement %}
-                                    <i class="fas fa-leaf fa-lg vg-icon"></i>
-                                {% endif %}
-                                </p>
-                                {% if session.user_session %}
-                                    <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
-                                        {% if session_user_id in recipe.user_like %}
-                                            <button class="like-btn">
-                                                <input type="hidden" class="check-favourite" name="check-favourite" value="true">
-                                                <i class="like-icon fas fa-heart"></i>
-                                            </button>
-                                            <span>{{ recipe.user_likes }}</span>
-                                            <span class="comment-margin"><i class="far fa-comments"></i></span>
-                                            <span>{{ recipe.comments_count }}</span>
-                                        {% else %}
-                                            <button class="like-btn">
-                                                <input type="hidden" class="check-favourite" name="check-favourite" value="false">
-                                                <i class="like-icon far fa-heart"></i>
-                                            </button>
-                                            <span>{{ recipe.user_likes }}</span>
-                                            <span class="comment-margin"><i class="far fa-comments"></i></span>
-                                            <span>{{ recipe.comments_count }}</span>
-                                        {% endif %}
-                                    </form>
-                                {% endif %}
+                                <p class="no-bottom-margin no-top-margin"><a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}" class="green-text darken-4 bold larger no-top-margin no-bottom-margin">{{ recipe.recipe_name.capitalize() }}</a></p>
+                                <div class="recipe-details">
+                                    <em>uploaded by</em> : {{ recipe.created_by }}
+                                    <!--Recipe high protein icon-->
+                                    {% if recipe.is_high_protein == "on" %}
+                                        <i class="fas fa-dumbbell fa-sm protein-icon"></i>
+                                    {% endif %}
+                                    <!--Recipe vegan icon-->
+                                    {% if 'Vegan' in recipe.dietary_requirement %}
+                                        <i class="fas fa-leaf fa-sm vg-icon"></i>
+                                    {% endif %}
+                                    {% if session.user_session %}
+                                        <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id, current_page='profile') }}" method="POST">
+                                            {% if session_user_id in recipe.user_like %}
+                                                <button class="like-btn">
+                                                    <input type="hidden" class="check-favourite" name="check-favourite" value="true">
+                                                    <i class="like-icon fas fa-heart"></i>
+                                                </button>
+                                                <span>{{ recipe.user_likes }}</span>
+                                                <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                                <span>{{ recipe.comments_count }}</span>
+                                            {% else %}
+                                                <button class="like-btn">
+                                                    <input type="hidden" class="check-favourite" name="check-favourite" value="false">
+                                                    <i class="like-icon far fa-heart"></i>
+                                                </button>
+                                                <span>{{ recipe.user_likes }}</span>
+                                                <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                                <span>{{ recipe.comments_count }}</span>
+                                            {% endif %}
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="col s4 m3">
+                            <div class="col s4 center-align">
                                 {% if session.user_session|lower == recipe.created_by|lower %}
-                                    <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument-->
+                                    <!--This button will send user to edit this recipe page, through the collection value of this recipe _id, which is added as function's argument  -->
                                     <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn-small edit-btn light-green darken-2">Edit</a>
 
                                     <!-- Delete confimation Modal Trigger -->
-                                    <a class="red btn-small modal-trigger" href="#modal1">Delete</a>
+                                    <a class="red btn-small delete-btn modal-trigger" href="#modal{{ loop.index }}">Delete</a>
                                     <!-- Modal Structure -->
-                                    <div id="modal1" class="modal yellow accent-4">
+                                    <div id="modal{{ loop.index }}" class="modal main-background white-text">
                                         <div class="modal-content">
-                                        <h4>Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
+                                        <h4 class="small-modal-text">Are you sure you want to delete <strong>{{ recipe.recipe_name }}</strong>?</h4>
                                         </div>
-                                        <div class="modal-footer yellow accent-4">
-                                        <a href="{{ url_for('get_recipes') }}" class="modal-close waves-effect waves-green btn-small red">Cancel</a>
-                                        <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument-->
+                                        <div class="modal-footer">
+                                        <a class="modal-close waves-effect waves-green btn-small red">Cancel</a>
+                                        <!--This button will delete this recipe, through the collection value of this recipe _id, which is added as function's argument  -->
                                         <a href="{{ url_for('delete_recipe', recipe_id=recipe._id) }}" class="modal-close waves-effect waves-green btn-small light-green darken-2">Confirm</a>
                                         </div>
                                     </div>
@@ -198,7 +231,11 @@
                 </div>
             {% endfor %}
 
-        {{ pagination.links }}
+        <div class="row">
+            <div class="col s12 m10 offset-m1">
+                {{ pagination.links }}
+            </div>
+        </div>
         
         {% else %}
             <div class="row">

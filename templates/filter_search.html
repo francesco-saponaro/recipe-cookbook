@@ -1,11 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <h3 class="center-align custom-margin">Apply Your Filters:</h3>
+    <h3 class="center-align custom-margin">Search recipe:</h3>
 
     <!--Filter form -->
-    <div class="row yellow accent-4 form-container custom-margin padding-top">
+    <div class="row form-container border-color custom-margin padding-top">
         <form class="col s12" method="GET" action="{{ url_for('filter_results') }}">
+            <div class="row small-margin">
+                <div class="col s12 center-align">
+                    <h5 class="main-color">Search by Recipe name or Ingredient <em>(optional)</em></h5>
+                </div>
+            </div>
+
+            <div class="row small-margin">
+                <div class="input-field col s12">
+                    <i class="fas fa-search prefix light-green-text darken-2"></i>
+                    <input type="text" name="recipe_name" id="recipe_name" minlength="3" class="validate">
+                    <label for="recipe_name"><small>Search Recipe by Name...</small></label>
+                </div>
+                <div class="input-field col s12">
+                    <i class="fas fa-search prefix light-green-text darken-2"></i>
+                    <input type="text" name="ingredient_name" id="ingredient_name" minlength="3" class="validate">
+                    <label for="ingredient_name"><small>Search by Ingredient...</small></label>
+                </div>
+            </div>
+
+            <div class="row small-margin">
+                <div class="col s12 center-align">
+                    <h5 class="main-color">Apply filters <em>(optional)</em></h5>
+                </div>
+            </div>
+
             <div class="row small-margin">
                 <!--Meal type-->
                 <div class="input-field col s12 m4">

@@ -39,7 +39,7 @@ def get_recipes():
     # the length of whole recipe collection and the record name which,
     # should be the name of whatever items are being paginated
     pagination = Pagination(page=page, total=recipes.count(),
-                            record_name='recipes')
+                            record_name='recipes')                       
 
     # Check if the user is logged in by checking if a session (cookie)
     # has been created for it.
@@ -99,7 +99,6 @@ def filter_results():
     for key, value in recipe.items():
         if value != None:
             final_results.update({key: value})
-    print(final_results)
 
     # If one or more allergens have been selected 
     # from the list, add all non selected items in the list to the 
@@ -114,7 +113,19 @@ def filter_results():
     diet = request.args.getlist("dietary_requirements")
     if diet != []:
         final_results.update({"dietary_requirement": {"$in": diet}})
-    
+
+    # If a recipe name has been added in the search query
+    # add it to the final results object.
+    query = request.args.get("recipe_name")
+    if query:    
+        final_results.update({"$text": {"$search": query}})
+
+    # If an ingredient name has been added in the search query
+    # add it to the final results object.
+    ingredient = request.args.get("ingredient_name")
+    if ingredient:    
+        final_results.update({'ingredient.ingredient_name': {"$regex" : ".*" + ingredient + ".*"}})
+        
     # If final results object is not empty, as in if the user chose
     # any option from any field to filter by, find a recipe that
     # matches the final results object. Else redirect user to Home 
@@ -144,52 +155,6 @@ def filter_results():
     else:
         return render_template("filter_results.html", recipe_page=recipe_page,
         pagination=pagination, final_results=final_results)
-
-
-
-@app.route("/query_search", methods=['GET','POST'])
-def query_search():
-    # Get value from the search query form, search index has been set up
-    # on the recipes collection to only find recipes by name or ingredients. 
-    # You need to use method="GET" on the form so the form passes the query 
-    # into the args, and then in the route, use request.args.get("query") and 
-    # not request.form.get - so the query is gotten from the args, 
-    # and is kept when you browse pages.
-    query = request.args.get("query")
-
-    if query:
-        # Check if a user is searching a recipe name or an ingredient
-        recipe_name = mongo.db.recipes.find({"$text": {"$search": query}})
-        ingredient = mongo.db.recipes.find({'ingredient.ingredient_name': {"$regex" : ".*" + query + ".*"}})
-        # Find matching recipe by query depending on if its a recipe name
-        # or ingredient.
-        if recipe_name.count() > 0:
-            recipes = mongo.db.recipes.find({"$text": {"$search": query}}).sort('user_likes', -1)
-        elif ingredient.count() > 0:
-            recipes = mongo.db.recipes.find({'ingredient.ingredient_name': {"$regex" : ".*" + query + ".*"}}).sort('user_likes', -1)
-        # If no matching recipes found, set recipes to an empty cursor to prevent
-        # an error, I am doing this by purposedly finding a non existent field
-        else:
-            recipes = mongo.db.recipes.find({'meal_type': "Midnight snack"})
-
-    # Pagination
-    page = request.args.get('page', 1, type=int)
-    per_page = 10
-    offset = per_page * (page - 1)
-    recipe_page = recipes.skip(offset).limit(per_page)
-    pagination = Pagination(page=page, total=recipes.count(),
-                            record_name='recipes')
-
-    if "user_session" in session:
-        session_user = mongo.db.users.find_one({"username": session["user_session"]})
-        session_user_id = str(session_user["_id"])
-
-        return render_template("query_search.html", recipe_page=recipe_page,
-        pagination=pagination, recipes=recipes, query=query, session_user_id=session_user_id)
-    else:
-        return render_template("query_search.html", recipe_page=recipe_page,
-        pagination=pagination, recipes=recipes, query=query)
-
 
 
 @app.route("/by_country")
@@ -741,6 +706,10 @@ def delete_recipe(recipe_id):
 
 @app.route("/like_recipe/<recipe_id>", methods=["GET", "POST"])
 def like_recipe(recipe_id):
+
+    current_page = request.args.get("current_page", None)
+    username=session['user_session']
+    
     # Liking a recipe will be executed through a form
     if request.method == "POST":
         # Defensive programming
@@ -764,7 +733,10 @@ def like_recipe(recipe_id):
                                             {"$inc": {"user_likes": 1}})
                     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
 
-                    return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
+                    return redirect(url_for(current_page, recipe_id=recipe_id, username=username ))
+
+
+                   # return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
 
             # If value is false (unlike) and recipe ID is in user liked_recipe field,
             # remove the recipe ID in the user liked_recipe field, remove the user ID in the
@@ -779,7 +751,7 @@ def like_recipe(recipe_id):
                     mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
                                             {"$inc": {"user_likes": -1}})
 
-                    return redirect(url_for("get_recipes"))
+                    return redirect(url_for(current_page, recipe_id=recipe_id, username=username))
 
     return redirect(url_for("get_recipes"))
 

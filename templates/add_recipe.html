@@ -3,7 +3,7 @@
 
     <h3 class="recipe-title center-align bottom-margin">Add Recipe</h3>
 
-    <div class="form-container row yellow accent-4">
+    <div class="form-container border-color">
         
         <form class="col s12" method="POST" action="{{ url_for('add_recipe') }}">
             <div class="row small-margin">
@@ -110,7 +110,7 @@
 
             <div class="row">
                 <div class="col s12 center-align">
-                    <h5>Ingredients:</h5>
+                    <h5 class="main-color">Ingredients:</h5>
                 </div>
                 <!--Add and remove ingredient buttons-->
                 <div class="input-field col s6">
@@ -153,11 +153,11 @@
     
             <div class="row no-bottom-margin">
                 <div class="col s12">
-                    <h5>Method:</h5>
+                    <h5 class="main-color">Method:</h5>
                 </div>
             </div>
 
-            <p class="no-top-margin">Describe the method<br><small>(Preferable format: "STEP1 Your Text. STEP2 Your Text." and so on...)</small></p>
+            <p class="no-top-margin main-color">Describe the method<br><small>(Preferable format: "STEP1 Your Text. STEP2 Your Text." and so on...)</small></p>
 
             <div class="row">
                 <!--Method-->
@@ -170,7 +170,7 @@
             <div class="row">
                 <!--Recipe picture URL-->
                 <div class="col s12 center-align">
-                    <p class="black-color no-bottom-margin">Add a URL for your recipe dish picture (Optional)</p>
+                    <p class="main-color no-bottom-margin">Add a URL for your recipe dish picture (Optional)</p>
                     <input class="center-align validate" type="text" name="recipe_image_url" title="The URL must end with the with any of the following formats: jpg/gif/png" pattern="^https?://(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:/[^/#?]+)+\.(?:jpg|gif|png)$">
                 </div>
             </div>
