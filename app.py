@@ -707,9 +707,6 @@ def delete_recipe(recipe_id):
 @app.route("/like_recipe/<recipe_id>", methods=["GET", "POST"])
 def like_recipe(recipe_id):
 
-    current_page = request.args.get("current_page", None)
-    username=session['user_session']
-    
     # Liking a recipe will be executed through a form
     if request.method == "POST":
         # Defensive programming
@@ -733,10 +730,8 @@ def like_recipe(recipe_id):
                                             {"$inc": {"user_likes": 1}})
                     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
 
-                    return redirect(url_for(current_page, recipe_id=recipe_id, username=username ))
-
-
-                   # return render_template("recipe_page.html", recipe=recipe, session_user_id=session_user_id)
+                    # Return the user to the current page
+                    return redirect(request.referrer)
 
             # If value is false (unlike) and recipe ID is in user liked_recipe field,
             # remove the recipe ID in the user liked_recipe field, remove the user ID in the
@@ -751,7 +746,8 @@ def like_recipe(recipe_id):
                     mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
                                             {"$inc": {"user_likes": -1}})
 
-                    return redirect(url_for(current_page, recipe_id=recipe_id, username=username))
+                    # Return the user to the current page
+                    return redirect(request.referrer)
 
     return redirect(url_for("get_recipes"))
 

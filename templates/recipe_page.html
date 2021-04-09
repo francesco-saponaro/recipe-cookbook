@@ -11,7 +11,7 @@
     {% if session.user_session %}
         <div class="row">
             <div class="col s12 recipe-title center-align">
-                <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id, current_page='recipe_page') }}" method="POST">
+                <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
                     {% if session_user_id in recipe.user_like %}
                         <button class="like-btn">
                             <input type="hidden" class="check-favourite" name="check-favourite" value="true">
