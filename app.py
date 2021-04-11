@@ -4,6 +4,9 @@ from flask import (
 from flask_pymongo import PyMongo, pymongo
 from flask_paginate import Pagination
 from bson.objectid import ObjectId
+import json
+from bson import json_util
+from bson.json_util import dumps
 from werkzeug.security import generate_password_hash, check_password_hash
 if os.path.exists("env.py"):
     import env
@@ -138,7 +141,7 @@ def filter_results():
         return redirect(url_for("get_recipes"))
     
     # Pagination
-    recipes = mongo.db.recipes.find(final_results).sort('user_likes', -1)
+    recipes = mongo.db.recipes.find(final_results)
     page = request.args.get('page', 1, type=int)
     per_page = 10
     offset = per_page * (page - 1)
@@ -180,7 +183,7 @@ def starters():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    recipes = mongo.db.recipes.find({"meal_type": "Starter"}).sort('user_likes', -1)
+    recipes = mongo.db.recipes.find({"meal_type": "Starter"})
     page = request.args.get('page', 1, type=int)
     per_page = 10
     offset = per_page * (page - 1)
@@ -204,7 +207,7 @@ def lunch():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    recipes = mongo.db.recipes.find({"meal_type": "Lunch"}).sort('user_likes', -1)
+    recipes = mongo.db.recipes.find({"meal_type": "Lunch"})
     page = request.args.get('page', 1, type=int)
     per_page = 10
     offset = per_page * (page - 1)
@@ -229,7 +232,7 @@ def brunch():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    recipes = mongo.db.recipes.find({"meal_type": "Brunch"}).sort('user_likes', -1)
+    recipes = mongo.db.recipes.find({"meal_type": "Brunch"})
     page = request.args.get('page', 1, type=int)
     per_page = 10
     offset = per_page * (page - 1)
@@ -254,7 +257,7 @@ def dinner():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    recipes = mongo.db.recipes.find({"meal_type": "Dinner"}).sort('user_likes', -1)
+    recipes = mongo.db.recipes.find({"meal_type": "Dinner"})
     page = request.args.get('page', 1, type=int)
     per_page = 10
     offset = per_page * (page - 1)
@@ -279,7 +282,7 @@ def desserts():
     # Get all recipes in order to populate page
     meal_types = mongo.db.meal_types.find()
     # Pagination
-    recipes = mongo.db.recipes.find({"meal_type": "Dessert"}).sort('user_likes', -1)
+    recipes = mongo.db.recipes.find({"meal_type": "Dessert"})
     page = request.args.get('page', 1, type=int)
     per_page = 10
     offset = per_page * (page - 1)
@@ -405,7 +408,7 @@ def profile(username):
                     username = mongo.db.users.find_one({"username": session["user_session"]})["username"]
                     # Pagination
                     # Grab all recipes created by the user to populate the page
-                    recipes = mongo.db.recipes.find({"created_by": session["user_session"]}).sort('user_likes', -1)
+                    recipes = mongo.db.recipes.find({"created_by": session["user_session"]})
                     page = request.args.get('page', 1, type=int)
                     per_page = 10
                     offset = per_page * (page - 1)
@@ -435,7 +438,7 @@ def profile(username):
                     # Find all recipes liked by the user through the user ID, which is added to the 
                     # recipes "user_like" field onclick.
                     # They will be needed to populate page with all liked recipes
-                    liked_recipes = mongo.db.recipes.find({"user_like": session_user_id}).sort('user_likes', -1)
+                    liked_recipes = mongo.db.recipes.find({"user_like": session_user_id})
                     page = request.args.get('page', 1, type=int)
                     per_page = 10
                     offset = per_page * (page - 1)
@@ -779,6 +782,61 @@ def comments(recipe_id):
 
     return render_template("recipe_page.html", recipe=recipe)
 
+
+@app.route('/dashboard')
+def dashboard():
+    # Iterate through desired category and for each iteration create
+    # a dict with the iteration and the count of recipes matching
+    # that iteration as values, then append dictionaries to a list
+    # as AMCharts works with lists of dictionaries.
+
+    # To populate "Recipes by Meal types" chart
+    meal_types_list = []
+    meal_types_dict = {}
+    meal_types = mongo.db.meal_types.find()
+    for meal_type in meal_types:
+        meal_types_dict = {'meal_type': meal_type['meal_type'],
+                           'amount':mongo.db.recipes.find({'meal_type': meal_type["meal_type"]}).count()}
+        meal_types_list.append(meal_types_dict)
+
+    # To populate "Recipes by Difficulty" chart
+    difficulties_list = []
+    difficulties_dict = {}
+    difficulties = mongo.db.difficulties.find()
+    for difficulty in difficulties:
+        difficulties_dict = {'difficulty': difficulty['difficulty'],
+                             'amount':mongo.db.recipes.find({'difficulty': difficulty['difficulty']}).count()}
+        difficulties_list.append(difficulties_dict)
+
+    # To populate "Recipes by User" chart
+    user_list = []
+    user_dict = {}
+    users = mongo.db.users.find()
+    for user in users:
+        user_dict = {'user': user['username'],
+                     'amount':mongo.db.recipes.find({'created_by': user['username']}).count()}
+        user_list.append(user_dict)
+
+    # To populate "Recipes by Country" chart
+    countries_list = []
+    countries_dict = {}
+    countries = mongo.db.countries.find()
+    for country in countries:
+        countries_dict = {'country': country["country"].capitalize(),
+                          'amount':mongo.db.recipes.find({'country': country["country"]}).count()}
+        countries_list.append(countries_dict)
+
+    # To populate "Recipes by Dietary Requirement" chart
+    diet_list = []
+    diet_dict = {}
+    diets = mongo.db.dietary_requirements.find()
+    for diet in diets:
+        diet_dict = {'dietary_requirement': diet["dietary_requirement"],
+                     'amount':mongo.db.recipes.find({'dietary_requirement': diet["dietary_requirement"]}).count()}
+        diet_list.append(diet_dict)
+    
+    
+    return render_template('dashboard.html', meal_types_list=meal_types_list, difficulties_list=difficulties_list,user_list=user_list, countries_list=countries_list, diet_list=diet_list)
 
 
 # error handler is a built in Flask function that returns a response 

@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Styles -->
+<style>
+    #meal-type-chart, #difficulty-chart, #user-chart, #country-chart, #diet-chart {
+        width: 100%;
+        height: 500px;
+    }
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<!-- Chart code -->
+<script>
+    /* RECIPES BY MEAL TYPES CHART */
+    am4core.ready(function () {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+
+        var chart = am4core.create("meal-type-chart", am4charts.PieChart3D);
+        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+        chart.legend = new am4charts.Legend();
+
+        chart.data = {{ meal_types_list|safe }};
+
+        chart.innerRadius = 100;
+
+        var series = chart.series.push(new am4charts.PieSeries3D());
+        series.dataFields.value = "amount";
+        series.dataFields.category = "meal_type";
+
+    }); // end am4core.ready()
+
+    /* RECIPES BY DIFFICULTY CHART */
+    am4core.ready(function() {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+
+        var chart = am4core.create("difficulty-chart", am4charts.PieChart);
+        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+        chart.data = {{ difficulties_list|safe }};
+        chart.radius = am4core.percent(70);
+        chart.innerRadius = am4core.percent(40);
+        chart.startAngle = 180;
+        chart.endAngle = 360;  
+
+        var series = chart.series.push(new am4charts.PieSeries());
+        series.dataFields.value = "amount";
+        series.dataFields.category = "difficulty";
+
+        series.slices.template.cornerRadius = 10;
+        series.slices.template.innerCornerRadius = 7;
+        series.slices.template.draggable = true;
+        series.slices.template.inert = true;
+        series.alignLabels = false;
+
+        series.hiddenState.properties.startAngle = 90;
+        series.hiddenState.properties.endAngle = 90;
+
+        chart.legend = new am4charts.Legend();
+    }); // end am4core.ready()
+
+    /* RECIPES BY USER CHART */
+    am4core.ready(function() {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+
+        var chart = am4core.create("user-chart", am4charts.PieChart3D);
+        chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+        chart.legend = new am4charts.Legend();
+
+        chart.data = {{ user_list|safe }};
+
+        var series = chart.series.push(new am4charts.PieSeries3D());
+        series.dataFields.value = "amount";
+        series.dataFields.category = "user";
+
+    }); // end am4core.ready()
+
+    /* RECIPES BY COUNTRY CHART */
+    am4core.ready(function() {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+
+        var chart = am4core.create("country-chart", am4charts.XYChart);
+        chart.padding(40, 40, 40, 40);
+
+        var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+        categoryAxis.renderer.grid.template.location = 0;
+        categoryAxis.dataFields.category = "country";
+        categoryAxis.renderer.minGridDistance = 1;
+        categoryAxis.renderer.inversed = true;
+        categoryAxis.renderer.grid.template.disabled = true;
+
+        var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+        valueAxis.min = 0;
+
+        var series = chart.series.push(new am4charts.ColumnSeries());
+        series.dataFields.categoryY = "country";
+        series.dataFields.valueX = "amount";
+        series.tooltipText = "{valueX.value}"
+        series.columns.template.strokeOpacity = 0;
+        series.columns.template.column.cornerRadiusBottomRight = 5;
+        series.columns.template.column.cornerRadiusTopRight = 5;
+
+        var labelBullet = series.bullets.push(new am4charts.LabelBullet())
+        labelBullet.label.horizontalCenter = "left";
+        labelBullet.label.dx = 10;
+        labelBullet.label.text = "{values.valueX.workingValue.formatNumber('#')}";
+        labelBullet.locationX = 1;
+
+        // as by default columns of the same series are of the same color, we add adapter which takes colors from chart.colors color set
+        series.columns.template.adapter.add("fill", function(fill, target){
+        return chart.colors.getIndex(target.dataItem.index);
+        });
+
+        categoryAxis.sortBySeries = series;
+        chart.data = {{ countries_list|safe }};
+        console.log(chart.data);
+
+    }); // end am4core.ready()
+
+    /* RECIPES BY DIETARY REQUIREMENTS CHART */
+    am4core.ready(function() {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+
+        // Create chart instance
+        var chart = am4core.create("diet-chart", am4charts.XYChart);
+        chart.scrollbarX = new am4core.Scrollbar();
+
+        // Add data
+        chart.data = {{ diet_list|safe }};
+
+        // Create axes
+        var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+        categoryAxis.dataFields.category = "dietary_requirement";
+        categoryAxis.renderer.grid.template.location = 0;
+        categoryAxis.renderer.minGridDistance = 30;
+        categoryAxis.renderer.labels.template.horizontalCenter = "right";
+        categoryAxis.renderer.labels.template.verticalCenter = "middle";
+        categoryAxis.renderer.labels.template.rotation = 270;
+        categoryAxis.tooltip.disabled = true;
+        categoryAxis.renderer.minHeight = 110;
+
+        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+        valueAxis.renderer.minWidth = 50;
+
+        // Create series
+        var series = chart.series.push(new am4charts.ColumnSeries());
+        series.sequencedInterpolation = true;
+        series.dataFields.valueY = "amount";
+        series.dataFields.categoryX = "dietary_requirement";
+        series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+        series.columns.template.strokeWidth = 0;
+
+        series.tooltip.pointerOrientation = "vertical";
+
+        series.columns.template.column.cornerRadiusTopLeft = 10;
+        series.columns.template.column.cornerRadiusTopRight = 10;
+        series.columns.template.column.fillOpacity = 0.8;
+
+        // on hover, make corner radiuses bigger
+        var hoverState = series.columns.template.column.states.create("hover");
+        hoverState.properties.cornerRadiusTopLeft = 0;
+        hoverState.properties.cornerRadiusTopRight = 0;
+        hoverState.properties.fillOpacity = 1;
+
+        series.columns.template.adapter.add("fill", function(fill, target) {
+        return chart.colors.getIndex(target.dataItem.index);
+        });
+
+        // Cursor
+        chart.cursor = new am4charts.XYCursor();
+
+    }); // end am4core.ready()
+</script>
+
+
+<!-- HTML -->
+<div class="row">
+    <div class="col s12 center-align">
+        <h2>Dashboard</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <h3 class="center-align">Recipes by Meal Type</h3>
+        <div id="meal-type-chart"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <h3 class="center-align">Recipes by Difficulty</h3>
+        <div id="difficulty-chart"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <h3 class="center-align">Total number of recipes by Country</h3>
+        <div id="country-chart"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <h3 class="center-align">Recipes by User</h3>
+        <div id="user-chart"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12">
+        <h3 class="center-align">Total number of recipes by Dietary Requirements</h3>
+        <div id="diet-chart"></div>
+    </div>
+</div>
+    
+{% endblock %}
