@@ -19,13 +19,19 @@
                             <input type="hidden" class="check-favourite" name="check-favourite" value="true">
                             <i class="like-icon fas fa-heart"></i>
                         </button>
-                        <span>{{ recipe.user_likes }} likes</span>
+                        <span>{{ recipe.user_likes }}</span>
+                        <!--Comment icon, link and count-->
+                        <a href="#add-comment" class="comment-link"><i class="far fa-comments"></i></a>
+                        <span>{{ recipe.comments_count }}</span>
                     {% else %}
                         <button class="like-btn">
                             <input type="hidden" class="check-favourite" name="check-favourite" value="false">
                             <i class="like-icon far fa-heart"></i>
                         </button>
-                        <span>{{ recipe.user_likes }} likes</span>
+                        <span>{{ recipe.user_likes }}</span>
+                        <!--Comment icon, link and count-->
+                        <a href="#add-comment" class="comment-link"><i class="far fa-comments"></i></a>
+                        <span>{{ recipe.comments_count }}</span>
                     {% endif %}
                 </form>
             </div>
@@ -145,7 +151,7 @@
 
     <!--Add comment form-->
     {% if session.user_session %}
-        <div class="row form-container recipe-container custom-margin main-background white-text">
+        <div id="add-comment" class="row form-container recipe-container custom-margin main-background white-text">
             <form action="{{ url_for('comments', recipe_id=recipe._id) }}" method="POST" class="col s12">
                 <div class="row center-align">
                     <div class="input-field col s12">
@@ -164,19 +170,25 @@
     {% endif %}
 
     <!--Comments panels-->
-    {% if recipe.comments|length > 0 %}
+    {% if recipe.comments_count > 0 %}
         <div class="row">
             <div class="col s12 center-align">
                 <h4 class="no-top-margin">Comments</h3>
             </div>
         </div>
     {% endif %}
-    {% for comment in recipe.comments %}
-        <div class="row form-container recipe-container bottom-margin main-background">
-            <div class="col s12">
-                <p class="no-bottom-margin no-top-margin white-text">{{ comment[0] }} - <em>by:</em> {{ comment[1] }}</p>
+    {% for comment in comments %}
+        {% if comment.recipe_id == recipe._id %}
+            <div class="row form-container recipe-container bottom-margin main-background">
+                <div class="col s12">
+                    <p class="no-bottom-margin no-top-margin white-text">{{ comment.comment }} - <em>by:</em> {{ comment.user }}
+                    {% if comment.user == username %}
+                        <a href="{{ url_for('delete_comment', recipe_id=recipe._id, comment_id=comment._id) }}" class="modal-close waves-effect waves-green btn-small right red">Delete</a>
+                    {% endif %}
+                    </p>
+                </div>
             </div>
-        </div>
+        {% endif %}
     {% endfor %}
     
     <script src="{{ url_for('static', filename='js/wrong_img_url.js') }}"></script>

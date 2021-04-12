@@ -44,8 +44,7 @@ def get_recipes():
     # Check if the user is logged in by checking if a session (cookie)
     # has been created for it.
     if "user_session" in session:
-        # The ID of the user in session is needed in order to be added
-        # to a liked recipe. Only logged in users can like a recipe.
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -148,6 +147,7 @@ def filter_results():
                             record_name='recipes')
 
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
     
@@ -166,6 +166,7 @@ def by_country():
     recipes = list(mongo.db.recipes.find())
 
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -190,6 +191,7 @@ def starters():
                             record_name='recipes')
 
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -214,6 +216,7 @@ def lunch():
                             record_name='recipes')
 
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -238,6 +241,7 @@ def brunch():
                             record_name='recipes')
 
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -262,6 +266,7 @@ def dinner():
                             record_name='recipes')
 
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -286,6 +291,7 @@ def desserts():
                             record_name='recipes')
     
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -310,6 +316,7 @@ def vegan():
                             record_name='recipes')
    
     if "user_session" in session:
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
@@ -415,6 +422,7 @@ def profile(username):
                     pagination = Pagination(page=page, total=recipes.count(),
                                             record_name='recipes')
 
+                    # Grab session user's id to check if he has liked the recipe
                     session_user = mongo.db.users.find_one({"username": 
                                                             session["user_session"]})
                     session_user_id = str(session_user["_id"])
@@ -521,7 +529,6 @@ def add_recipe():
                     # Empty lists and integers values to store user likes, comments and amounts
                     "user_like": [],
                     "user_likes": int(0),
-                    "comments": [],
                     "comments_count": int(0),
                     # Grab this value from user in session
                     "created_by": session["user_session"]
@@ -613,7 +620,6 @@ def edit_recipe(recipe_id):
                 recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
                 user_like = recipe["user_like"]
                 user_likes = recipe["user_likes"]
-                comments = recipe["comments"]
                 comments_count = recipe["comments_count"]
 
                 # Dictionary with all values taken from form, plus non editable
@@ -634,7 +640,6 @@ def edit_recipe(recipe_id):
                     "recipe_image_url": request.form.get("recipe_image_url"),
                     "user_like": user_like,
                     "user_likes": user_likes,
-                    "comments": comments,
                     "comments_count": comments_count,
                     # Grab this value from logged in user
                     "created_by": session["user_session"]
@@ -695,28 +700,35 @@ def edit_recipe(recipe_id):
 def recipe_page(recipe_id):
     # Grab current recipe to populate page
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    # Grab comments to populate page
+    comments = mongo.db.comments.find()
 
     if "user_session" in session:
+        # Grab user's username to check if comments belong to him
+        username = mongo.db.users.find_one({"username": 
+                                             session["user_session"]})["username"]
+        # Grab session user's id to check if he has liked the recipe
         session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
         
         return render_template("recipe_page.html", recipe=recipe, 
-        session_user_id=session_user_id, session_user=session_user)
+        session_user_id=session_user_id, session_user=session_user, comments=comments, username=username)
     else:
-        return render_template("recipe_page.html", recipe=recipe)
+        return render_template("recipe_page.html", recipe=recipe, comments=comments)
 
 
 @app.route("/delete_recipe/<recipe_id>")
 def delete_recipe(recipe_id):
-    # Grab the current recipe and delete it
+    # Grab the current recipe and all comments with current
+    # recipe id and delete them
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    comment = mongo.db.comments.find({"recipe_id": ObjectId(recipe_id)})
     mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
+    for i in comment:
+        mongo.db.comments.remove(i)
     # Remove deleted recipe from users likes and comments fields, if any
     mongo.db.users.update_many({},
                                {"$pull": {"liked_recipe": ObjectId(recipe_id)}})
-    mongo.db.users.update_many({},
-                               {"$pull": {"user_comments": {"recipe_id": 
-                                                            ObjectId(recipe_id)}}})
 
     # Redirect user to Home page
     flash("Recipe successfully deleted")
@@ -781,17 +793,13 @@ def comments(recipe_id):
             session_user = mongo.db.users.find_one({"username": session["user_session"]})
 
             # Get comment from form 
-            # Add the commented recipe ID and the comment in the user's user_comments field
-            # in the form of a dictionary. Add the comment and user's username in the commented 
-            # recipe's comments field in the form of a list.
-            # Increase recipe's comments_count field by 1
+            # Add the commented recipe ID, the user's username and the comment in the comments
+            # collection, and increase commented recipe's comments_count field by 1 
             # Redirect user to recipe page
             comment = request.form.get("comment")
-            mongo.db.users.update({"username": session["user_session"]},
-                                  {"$push": {"user_comments": {"recipe_id": ObjectId(recipe_id), 
-                                                               "comment": comment}}})
-            mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
-                                    {"$push": {"comments": [comment, session_user["username"]]}})
+            mongo.db.comments.insert_one({"recipe_id": ObjectId(recipe_id),
+                                          "user": session_user["username"],
+                                          "comment": comment})
             mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
                                     {"$inc": {"comments_count": 1}})
             recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
@@ -799,6 +807,19 @@ def comments(recipe_id):
             return render_template("recipe_page.html", recipe=recipe)
 
     return render_template("recipe_page.html", recipe=recipe)
+
+
+@app.route("/delete_comment/<recipe_id>/<comment_id>")
+def delete_comment(recipe_id, comment_id):
+    # Grab the targeted comment and delete it
+    mongo.db.comments.remove({"_id": ObjectId(comment_id)})
+    # Decrease recipe's comment's count field by 1.
+    mongo.db.recipes.update({"_id": ObjectId(recipe_id)},
+                            {"$inc": {"comments_count": -1}})
+
+    # Redirect the user to the current page
+    flash("Comment successfully deleted")
+    return redirect(request.referrer)
 
 
 @app.route('/dashboard')

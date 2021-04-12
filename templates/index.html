@@ -46,8 +46,8 @@
                                             <i class="like-icon fas fa-heart"></i>
                                         </button>
                                         <span>{{ recipe.user_likes }}</span>
-                                        <!--Comment icon and count-->
-                                        <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                        <!--Comment icon, link and count-->
+                                        <a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}#add-comment" class="comment-link"><i class="far fa-comments"></i></a>
                                         <span>{{ recipe.comments_count }}</span>
                                     {% else %}
                                         <button class="like-btn">
@@ -55,7 +55,8 @@
                                             <i class="like-icon far fa-heart"></i>
                                         </button>
                                         <span>{{ recipe.user_likes }}</span>
-                                        <span class="comment-margin"><i class="far fa-comments"></i></span>
+                                        <!--Comment icon, link and count-->
+                                        <a href="{{ url_for('recipe_page', recipe_id=recipe._id) }}#add-comment" class="comment-link"><i class="far fa-comments"></i></a>
                                         <span>{{ recipe.comments_count }}</span>
                                     {% endif %}
                                 </form>
