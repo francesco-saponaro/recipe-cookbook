@@ -1,6 +1,10 @@
+//Get added image URL
 let url = document.getElementById("recipe-img").src;
+//Get image outer container
 let imgContainer = document.getElementById("img-container")
 
+//Check if the URL is wrong by checking for a 404 error, if so  add class to container
+//and replace image tag with with error info headers
 function checkImage(url, cont) {
   var request = new XMLHttpRequest();
   request.open("GET", url, true);

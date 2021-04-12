@@ -1,5 +1,7 @@
+//Get form's like button
 const likesButtons = document.querySelectorAll('.like-btn');
 
+//Change Icon class and input value on click
 likesButtons.forEach(likeButton => {
     likeButton.addEventListener('click', e => {
         console.log(e);

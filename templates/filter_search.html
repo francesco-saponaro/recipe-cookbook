@@ -3,7 +3,7 @@
 
     <h3 class="center-align custom-margin">Search recipe:</h3>
 
-    <!--Filter form -->
+    <!--Search and Filter form -->
     <div class="row form-container border-color custom-margin padding-top">
         <form class="col s12" method="GET" action="{{ url_for('filter_results') }}">
             <div class="row small-margin">
@@ -13,11 +13,13 @@
             </div>
 
             <div class="row small-margin">
+                <!--Recipe name input-->
                 <div class="input-field col s12">
                     <i class="fas fa-search prefix light-green-text darken-2"></i>
                     <input type="text" name="recipe_name" id="recipe_name" minlength="3" class="validate">
                     <label for="recipe_name"><small>Search Recipe by Name...</small></label>
                 </div>
+                <!--Ingredient input-->
                 <div class="input-field col s12">
                     <i class="fas fa-search prefix light-green-text darken-2"></i>
                     <input type="text" name="ingredient_name" id="ingredient_name" minlength="3" class="validate">
@@ -31,6 +33,7 @@
                 </div>
             </div>
 
+            <!--Filters options-->
             <div class="row small-margin">
                 <!--Meal type-->
                 <div class="input-field col s12 m4">

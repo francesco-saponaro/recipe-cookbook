@@ -1,4 +1,4 @@
-//Materialize trigger function
+//Materialize triggers function
 $(document).ready(function(){
 $('.sidenav').sidenav();
 $('.dropdown-trigger').dropdown();
@@ -7,6 +7,7 @@ $('.modal').modal();
 });
 
 //Materialize select elements validation function
+//This function was taken from a Code institute's lesson, https://codeinstitute.net/
 validateMaterializeSelect();
 function validateMaterializeSelect() {
     let classValid = { "border-bottom": "1px solid #4caf50", "box-shadow": "0 1px 0 0 #4caf50" };

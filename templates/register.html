@@ -4,9 +4,10 @@
     <h3 class="center-align">Register</h3>
     
     <div class="row">
+        <!--Log in form-->
         <form class="col s12 m8 offset-m2" method="POST" action="{{ url_for('register') }}">
             <div class="card-panel border-color">
-                <!-- username -->
+                <!--Username-->
                 <div class="row">
                     <div class="input-field col s12">
                     <i class="fas fa-user-plus prefix light-green-text text-darken-2"></i>
@@ -14,7 +15,8 @@
                     <label for="username">Username</label>
                     </div>
                 </div>
-                <!-- password -->
+
+                <!--Password-->
                 <div class="row">
                     <div class="input-field col s12">
                     <i class="fas fa-user-lock prefix light-green-text text-darken-2"></i>
@@ -22,7 +24,8 @@
                     <label for="password">Password</label>
                     </div>
                 </div>
-                <!-- register -->
+
+                <!--Register button-->
                 <div class="row">
                     <button type="submit" class="col s12 btn-large main-background">
                         Register <i class="fas fa-sign-in-alt"></i>

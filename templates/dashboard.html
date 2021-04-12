@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- Styles -->
+<!--Styles-->
 <style>
     #meal-type-chart, #difficulty-chart, #user-chart, #country-chart, #diet-chart {
         width: 100%;
@@ -9,12 +9,12 @@
     }
 </style>
 
-<!-- Resources -->
+<!--Am charts libraries-->
 <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
 <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
 <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
 
-<!-- Chart code -->
+<!--Charts code-->
 <script>
     /* RECIPES BY MEAL TYPES CHART */
     am4core.ready(function () {
@@ -194,36 +194,46 @@
 </script>
 
 
-<!-- HTML -->
+<!--HTML-->
 <div class="row">
     <div class="col s12 center-align">
         <h2>Dashboard</h2>
     </div>
 </div>
+
+<!--BY MEAL TYPE CHART-->
 <div class="row">
     <div class="col s12">
         <h3 class="center-align">Recipes by Meal Type</h3>
         <div id="meal-type-chart"></div>
     </div>
 </div>
+
+<!--BY DIFFICULTY CHART-->
 <div class="row">
     <div class="col s12">
         <h3 class="center-align">Recipes by Difficulty</h3>
         <div id="difficulty-chart"></div>
     </div>
 </div>
+
+<!--BY COUNTRY CHART-->
 <div class="row">
     <div class="col s12">
         <h3 class="center-align">Total number of recipes by Country</h3>
         <div id="country-chart"></div>
     </div>
 </div>
+
+<!--BY USER CHART-->
 <div class="row">
     <div class="col s12">
         <h3 class="center-align">Recipes by User</h3>
         <div id="user-chart"></div>
     </div>
 </div>
+
+<!--BY DIETARY REQUIREMENT CHART-->
 <div class="row">
     <div class="col s12">
         <h3 class="center-align">Total number of recipes by Dietary Requirements</h3>

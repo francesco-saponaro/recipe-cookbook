@@ -4,7 +4,7 @@
     <h3 class="recipe-title center-align bottom-margin">Edit Recipe</h3>
 
     <div class="form-container border-color">
-
+        <!--Edit recipe form-->
         <form class="col s12" method="POST" action="{{ url_for('edit_recipe', recipe_id=recipe._id) }}">
             <div class="row small-margin">
                 <!--Recipe name-->
@@ -153,6 +153,7 @@
                  </div>
             </div>
 
+            <!--Ingredients container-->
             <div id="ingredients-container">
                 {% for ingredient in recipe.ingredient %}
                     <div class="row">

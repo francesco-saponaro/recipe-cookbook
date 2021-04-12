@@ -4,6 +4,7 @@
     <div class="row">
         <div class="col s12 m10 offset-m1 flex-col">
             <h3 class="no-bottom-margin flex-self">Recipes</h3>
+            <!--Recipe search button-->
             <a class="add-filter-btn right-float waves-effect waves-light btn-large" href="{{ url_for('filter_search') }}"><span class="add-filter-title">Search</span> <i class="fas fa-search"></i></a>
         </div>
     </div>
@@ -36,6 +37,7 @@
                             {% if 'Vegan' in recipe.dietary_requirement %}
                                 <i class="fas fa-leaf fa-sm vg-icon"></i>
                             {% endif %}
+                            <!--Like button form-->
                             {% if session.user_session %}
                                 <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
                                     {% if session_user_id in recipe.user_like %}
@@ -44,6 +46,7 @@
                                             <i class="like-icon fas fa-heart"></i>
                                         </button>
                                         <span>{{ recipe.user_likes }}</span>
+                                        <!--Comment icon and count-->
                                         <span class="comment-margin"><i class="far fa-comments"></i></span>
                                         <span>{{ recipe.comments_count }}</span>
                                     {% else %}

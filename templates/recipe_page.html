@@ -2,6 +2,7 @@
 {% block content %}
 
     <div class="row">
+        <!--Recipe title-->
         <div class="col s12 recipe-title center-align">
             <h3>{{ recipe.recipe_name.capitalize() }} {% if 'Vegan' in recipe.dietary_requirement %}<span><i class="fas fa-leaf vg-icon"></i></span>{% endif %}</h3>
             <h6><em>uploaded by:</em> {{ recipe.created_by }}</h6>
@@ -11,6 +12,7 @@
     {% if session.user_session %}
         <div class="row">
             <div class="col s12 recipe-title center-align">
+                <!--Like button form-->
                 <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
                     {% if session_user_id in recipe.user_like %}
                         <button class="like-btn">
@@ -46,8 +48,8 @@
         </div>  
     {% endif %}
 
+    <!--Recipe description panel-->
     <div class="form-container recipe-container row border-color center-align">
-
         <div class="row small-margin">
             <!--Meal type-->
             <div class="input-field col s12 m4">
@@ -139,9 +141,9 @@
                 {% endautoescape %}
             </div>
         </div>
-
     </div>
 
+    <!--Add comment form-->
     {% if session.user_session %}
         <div class="row form-container recipe-container custom-margin main-background white-text">
             <form action="{{ url_for('comments', recipe_id=recipe._id) }}" method="POST" class="col s12">
@@ -161,6 +163,7 @@
         </div>
     {% endif %}
 
+    <!--Comments panels-->
     {% if recipe.comments|length > 0 %}
         <div class="row">
             <div class="col s12 center-align">
@@ -168,7 +171,6 @@
             </div>
         </div>
     {% endif %}
-    
     {% for comment in recipe.comments %}
         <div class="row form-container recipe-container bottom-margin main-background">
             <div class="col s12">
@@ -178,4 +180,5 @@
     {% endfor %}
     
     <script src="{{ url_for('static', filename='js/wrong_img_url.js') }}"></script>
+    
 {% endblock %}

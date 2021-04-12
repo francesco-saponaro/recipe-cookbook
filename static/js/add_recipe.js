@@ -1,3 +1,4 @@
+//Get ingredients container
 let ingredientsContainer = document.getElementById("ingredients-container");
 
 //Remove ingredient row function

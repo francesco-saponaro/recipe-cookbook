@@ -4,6 +4,7 @@
     <div class="row">
         <div class="col s12 m10 offset-m1 flex-col">
             <h3 class="no-bottom-margin flex-self quick-title">Dessert Recipes</h3>
+            <!--Recipe search button-->
             <a class="add-filter-btn right-float waves-effect waves-light btn-large" href="{{ url_for('filter_search') }}"><span class="add-filter-title">Search</span> <i class="fas fa-search"></i></a>
         </div>
     </div>
@@ -13,6 +14,7 @@
             {{ pagination.info }}
             {% if session.user_session %}
                 <!--url_for will call the specified function's url which in turn will call the function-->
+                <!--Add recipe button-->
                 <a href="{{ url_for('add_recipe') }}" class="add-filter-btn waves-effect waves-light btn-large right"><span class="add-filter-title">Add recipe</span> <i class="fas fa-plus"></i></a>
             {% endif %}
         </div>
@@ -20,7 +22,6 @@
     
     <!--Recipe panel-->
     {% if recipe_page.count() > 0 %}
-        
         {% for recipe in recipe_page %}
             <div class="row">
                 <div class="col s12 m10 offset-m1">
@@ -38,6 +39,7 @@
                                 {% if 'Vegan' in recipe.dietary_requirement %}
                                     <i class="fas fa-leaf fa-sm vg-icon"></i>
                                 {% endif %}
+                                <!--Like button form-->
                                 {% if session.user_session %}
                                     <form class="like-form-margin" action="{{ url_for('like_recipe', recipe_id=recipe._id) }}" method="POST">
                                         {% if session_user_id in recipe.user_like %}
@@ -46,6 +48,7 @@
                                                 <i class="like-icon fas fa-heart"></i>
                                             </button>
                                             <span>{{ recipe.user_likes }}</span>
+                                            <!--Comment icon and count-->
                                             <span class="comment-margin"><i class="far fa-comments"></i></span>
                                             <span>{{ recipe.comments_count }}</span>
                                         {% else %}
