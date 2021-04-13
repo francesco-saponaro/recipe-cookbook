@@ -55,27 +55,6 @@
                         {% endfor %}
                     </select>
                 </div>
-                <!--Dietary requirements-->
-                <div class="input-field col s12 m4">
-                    <select id="dietary_requirements" name="dietary_requirements" class="validate" required multiple>
-                        <option value="" disabled>Dietary requirements</option>
-                        {% for dietary_requirement in dietary_requirements %}
-                            <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <!--Allergens-->
-                <div class="input-field col s12 m4">
-                    <select id="allergens" name="allergens" class="validate" required multiple>
-                        <option value="" disabled>Allergens</option>
-                        {% for allergen in allergens %}
-                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
                 <!--Servings-->
                 <div class="input-field col s12 m4">
                     <select id="servings" name="servings" class="browser-default" required>
@@ -86,12 +65,35 @@
                     </select>
                 </div>
                 <!--Country-->
-                <div class="input-field col s6 m4">
+                <div class="input-field col s12 m4">
                     <input id="countries" name="countries" type="text" pattern="^[a-zA-Z][a-zA-Z\s']+$" title="The country name can only contain alphabetic characters, apostrophe and whitespace. The country name can only start with a alphabetic character">
                     <label for="countries">Country</label>
                 </div>
+            </div>
+
+            <div class="row flex-col block">
+                <!--Dietary requirements-->
+                <div class="input-field col s12 m4">
+                    <span class="multiple-span">Dietary Requirements <br> <small class="multiple-small">Click this to focus the multiple select element</small></span>
+                    <select id="dietary_requirements" name="dietary_requirements" class="js-example-basic-multiple" style="width: 100%" multiple="multiple" required>
+                        <option value="" disabled>Dietary requirements</option>
+                        {% for dietary_requirement in dietary_requirements %}
+                            <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!--Allergens-->
+                <div class="input-field col s12 m4">
+                    <span class="multiple-span">Allergens <br> <small class="multiple-small">Click this to focus the multiple select element</small></span>
+                    <select id="allergens" name="allergens" class="js-example-basic-multiple" style="width: 100%" multiple="multiple" required>
+                        <option value="" disabled>Allergens</option>
+                        {% for allergen in allergens %}
+                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <!--High protein checkbox-->
-                <div class="input-field col s6 m4">
+                <div class="input-field col s12 m4">
                     <p>
                     <label>
                         <input type="checkbox" id="is_high_protein" name="is_high_protein" />

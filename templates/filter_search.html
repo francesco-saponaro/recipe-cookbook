@@ -77,29 +77,6 @@
                         {% endfor %}
                     </select>
                 </div>
-                <!--Dietary requirements-->
-                <div class="input-field col s12 m4">
-                    <select id="dietary_requirements" name="dietary_requirements" class="validate" multiple>
-                        <option value="" disabled>Dietary requirements</option>
-                        {% for dietary_requirement in dietary_requirements %}
-                            {% if dietary_requirement != "None" %}
-                                <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <!--Allergens-->
-                <div class="input-field col s12 m4">
-                    <select id="allergens" name="allergens" class="validate" multiple>
-                        <option value="" disabled>Allergens</option>
-                        {% for allergen in allergens %}
-                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
                 <!--Country-->
                 <div class="input-field col s12 m4">
                     <select id="countries" name="countries" class="browser-default">
@@ -118,9 +95,37 @@
                     </label>
                     </p>
                 </div>
-                <div class="input-field col s12 m4">
-                    <a href="{{ url_for('get_recipes') }}" class="waves-effect waves-green btn-small red cancel-btn">Cancel</a>
-                    <button type="submit" class="waves-effect waves-green btn-small light-green darken-2 apply-btn">Apply</button>
+            </div>
+
+            <div class="row">
+                <!--Dietary requirements-->
+                <div class="input-field col s12 m6">
+                    <span class="multiple-span">Dietary Requirements <br> <small class="multiple-small">Click this to focus the multiple select element</small></span>
+                    <select id="dietary_requirements" name="dietary_requirements" class="js-example-basic-multiple" style="width: 100%" multiple="multiple">
+                        <option value="" disabled>Dietary requirements</option>
+                        {% for dietary_requirement in dietary_requirements %}
+                            {% if dietary_requirement != "None" %}
+                                <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <!--Allergens-->
+                <div class="input-field col s12 m6">
+                    <span class="multiple-span">Allergens <br> <small class="multiple-small">Click this to focus the multiple select element</small></span>
+                    <select id="allergens" name="allergens" class="js-example-basic-multiple" style="width: 100%" multiple="multiple">
+                        <option value="" disabled>Allergens</option>
+                        {% for allergen in allergens %}
+                            <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="row"></div>
+                    <!--Apply and cancel buttons-->
+                    <div class="input-field col s12">
+                        <a href="{{ url_for('get_recipes') }}" class="waves-effect waves-green btn-small red cancel-btn">Cancel</a>
+                        <button type="submit" class="waves-effect waves-green btn-small light-green darken-2 apply-btn">Apply</button>
+                    </div>
                 </div>
             </div>
         </form>
