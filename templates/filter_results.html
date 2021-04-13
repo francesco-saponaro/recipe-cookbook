@@ -20,14 +20,13 @@
         </div>
     </div>
 
-    <div class="row no-top-margin">
-        <div class="col s12 m10 offset-m1 flex-col">
-            {{ pagination.info }}
-        </div>
-    </div>
-
     <!--Recipe panel-->
     {% if recipe_page.count() > 0 %}
+        <div class="row lg-margin-top">
+            <div class="col s12 m10 offset-m1 flex-col">
+                {{ pagination.info }}
+            </div>
+        </div>
         {% for recipe in recipe_page %}
             <div class="row">
                 <div class="col s12 m10 offset-m1">
@@ -103,7 +102,7 @@
         </div>
 
     {% else %}
-        <h3 class="red-text text-darken-4 center-align bottom-margin">No Results Found</h3>
+        <h3 class="red-text text-darken-4 center-align lg-margin-top bottom-margin">No Results Found</h3>
     {% endif %}
         
 {% endblock %}
