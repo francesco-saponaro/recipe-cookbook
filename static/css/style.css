@@ -491,13 +491,6 @@ h3 span {
     }
 }
 
-@media (max-width:550px) {
-    .modal { 
-        width: 70% !important ; 
-        height: 28% !important ; 
-    }
-}
-
 @media (max-width:522px) {
     .recipe-image {
         height: 350px;
@@ -506,20 +499,15 @@ h3 span {
     .image-error-text {
         height: 350px;
     }
-
-    .modal { 
-        height: 32% !important ; 
-    }
 }
 
 @media (max-width:500px) {
-    .modal { 
-        width: 45% !important ; 
-        height: 28% !important ; 
-    }
-
     .small-modal-text {
         font-size:20px;
+    }
+
+    .modal .modal-footer {
+        text-align:center;
     }
 
     .add-filter-btn {
