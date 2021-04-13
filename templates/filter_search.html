@@ -37,7 +37,7 @@
             <div class="row small-margin">
                 <!--Meal type-->
                 <div class="input-field col s12 m4">
-                    <select id="meal_types" name="meal_types" class="validate" >
+                    <select id="meal_types" name="meal_types" class="browser-default" >
                         <option value="" disabled selected>Meal type</option>
                         {% for meal_type in meal_types %}
                             {% if meal_type != "None" %}
@@ -46,40 +46,36 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="meal_types">Meal type</label>
                 </div>
                 <!--Difficulty-->
                 <div class="input-field col s12 m4">
-                    <select id="difficulties" name="difficulties" class="validate">
+                    <select id="difficulties" name="difficulties" class="browser-default">
                         <option value="" disabled selected>Difficulty</option>
                         {% for difficulty in difficulties %}
                             <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
                         {% endfor %}
                     </select>
-                    <label for="difficulties">Difficulty</label>
                 </div>
                 <!--Prep time-->
                 <div class="input-field col s12 m4">
-                    <select id="prep_times" name="prep_times" class="validate">
+                    <select id="prep_times" name="prep_times" class="browser-default">
                         <option value="" disabled selected>Prep time</option>
                         {% for prep_time in prep_times %}
                             <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
                         {% endfor %}
                     </select>
-                    <label for="prep_times">Prep time</label>
                 </div>
             </div>
 
             <div class="row small-margin">
                 <!--Calories-->
                 <div class="input-field col s12 m4">
-                    <select id="calories" name="calories" class="validate">
+                    <select id="calories" name="calories" class="browser-default">
                         <option value="" disabled selected>Calories</option>
                         {% for calorie_amount in calories %}
                             <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
                         {% endfor %}
                     </select>
-                    <label for="calories">Calories</label>
                 </div>
                 <!--Dietary requirements-->
                 <div class="input-field col s12 m4">
@@ -91,7 +87,6 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="dietary_requirements">Dietary requirements</label>
                 </div>
                 <!--Allergens-->
                 <div class="input-field col s12 m4">
@@ -101,20 +96,18 @@
                             <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
                         {% endfor %}
                     </select>
-                    <label for="allergens">Allergens</label>
                 </div>
             </div>
 
             <div class="row">
                 <!--Country-->
                 <div class="input-field col s12 m4">
-                    <select id="countries" name="countries" class="validate">
+                    <select id="countries" name="countries" class="browser-default">
                         <option value="" disabled selected>Available countries</option>
                         {% for country in countries %}
                             <option value="{{ country.country }}">{{ country.country.capitalize() }}</option>
                         {% endfor %}
                     </select>
-                    <label for="countries">Country</label>
                 </div>
                 <!--High protein checkbox-->
                 <div class="input-field col s12 m4">

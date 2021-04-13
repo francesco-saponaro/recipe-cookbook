@@ -17,47 +17,43 @@
             <div class="row small-margin">
                 <!--Meal type-->
                 <div class="input-field col s12 m4">
-                    <select id="meal_types" name="meal_types" class="validate" required>
+                    <select id="meal_types" name="meal_types" class="browser-default" required>
                         <option value="" disabled selected>Meal type</option>
                         {% for meal_type in meal_types %}
                             <!--The value is what will be sent to the server(Database), the content is what is displayed-->
                             <option value="{{ meal_type.meal_type }}">{{ meal_type.meal_type }}</option>
                         {% endfor %}
                     </select>
-                    <label for="meal_types">Meal type</label>
                 </div>
                 <!--Difficulty-->
                 <div class="input-field col s12 m4">
-                    <select id="difficulties" name="difficulties" class="validate" required>
+                    <select id="difficulties" name="difficulties" class="browser-default" required>
                         <option value="" disabled selected>Difficulty</option>
                         {% for difficulty in difficulties %}
                             <option value="{{ difficulty.difficulty }}">{{ difficulty.difficulty }}</option>
                         {% endfor %}
                     </select>
-                    <label for="difficulties">Difficulty</label>
                 </div>
                 <!--Prep time-->
                 <div class="input-field col s12 m4">
-                    <select id="prep_times" name="prep_times" class="validate" required>
+                    <select id="prep_times" name="prep_times" class="browser-default" required>
                         <option value="" disabled selected>Prep time</option>
                         {% for prep_time in prep_times %}
                             <option value="{{ prep_time.prep_time }}">{{ prep_time.prep_time }}</option>
                         {% endfor %}
                     </select>
-                    <label for="prep_times">Prep time</label>
                 </div>
             </div>
 
             <div class="row small-margin">
                 <!--Calories-->
                 <div class="input-field col s12 m4">
-                    <select id="calories" name="calories" class="validate" required>
+                    <select id="calories" name="calories" class="browser-default" required>
                         <option value="" disabled selected>Calories</option>
                         {% for calorie_amount in calories %}
                             <option value="{{ calorie_amount.calorie_amount }}">{{ calorie_amount.calorie_amount }}</option>
                         {% endfor %}
                     </select>
-                    <label for="calories">Calories</label>
                 </div>
                 <!--Dietary requirements-->
                 <div class="input-field col s12 m4">
@@ -67,7 +63,6 @@
                             <option value="{{ dietary_requirement.dietary_requirement }}">{{ dietary_requirement.dietary_requirement }}</option>
                         {% endfor %}
                     </select>
-                    <label for="dietary_requirements">Dietary requirements</label>
                 </div>
                 <!--Allergens-->
                 <div class="input-field col s12 m4">
@@ -77,20 +72,18 @@
                             <option value="{{ allergen.allergen }}">{{ allergen.allergen }}</option>
                         {% endfor %}
                     </select>
-                    <label for="allergens">Allergens</label>
                 </div>
             </div>
 
             <div class="row">
                 <!--Servings-->
                 <div class="input-field col s12 m4">
-                    <select id="servings" name="servings" class="validate" required>
+                    <select id="servings" name="servings" class="browser-default" required>
                         <option value="" disabled selected>Servings</option>
                         {% for serving in servings %}
                             <option value="{{ serving.serving }}">{{ serving.serving }}</option>
                         {% endfor %}
                     </select>
-                    <label for="servings">Servings</label>
                 </div>
                 <!--Country-->
                 <div class="input-field col s6 m4">
@@ -136,7 +129,7 @@
                     </div>
                     <!--Ingredient unit-->
                     <div class="input-field col s12 m4">
-                        <select id="unit" name="unit" class="browser-default unit-select" required>
+                        <select id="unit" name="unit" class="browser-default" required>
                             <option value="" disabled selected>Units</option>
                             <option value="Ml">Ml</option>
                             <option value="Litre">Litre</option>
@@ -147,7 +140,6 @@
                             <option value="Pinch">Pinch</option>
                             <option value="None">None</option>
                         </select>
-                        <label for="unit"></label>
                     </div>
                 </div>
             </div>

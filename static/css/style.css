@@ -297,7 +297,10 @@ input:-webkit-autofill:active
 /* Add recipe page */
 .input-field>label {
     color: #913f39;
+    font-size:16px;
+    padding-left: 4px;
 }
+
 
 [type="checkbox"]+span:not(.lever):before, [type="checkbox"]:not(.filled-in)+span:not(.lever):after {
     border: 2px solid #913f39;
@@ -313,32 +316,29 @@ input:-webkit-autofill:active
     height:55px;
 }
 
-.unit-select {
+select {
     background-color: #fff;
     border: None;
     border-bottom: 1px solid #9e9e9e;
     padding-left:0;
+    font-size:16px;
+    color:#913f39;
 }
 
-.unit-select:focus {
+select:focus {
     outline: 1px solid #fff;
 }
 
-.unit-select option {
-    background-color: #fff;
+.select-dropdown {
     color:#913f39;
 }
 
-select {
-    color:#913f39;
+.select-wrapper input.select-dropdown {
+    padding-left:4px;
 }
 
-select option {
-    color:#913f39;
-}
-
-label > span {
-    color:#913f39;
+.select-wrapper .caret {
+    fill: #913f39;
 }
 
 /* Filter page */

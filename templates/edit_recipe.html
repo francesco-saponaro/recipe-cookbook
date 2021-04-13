@@ -17,7 +17,7 @@
             <div class="row small-margin">
                 <!--Meal type-->
                 <div class="input-field col s12 m4">
-                    <select id="meal_types" name="meal_types" class="validate" required>
+                    <select id="meal_types" name="meal_types" class="browser-default" required>
                         <option value="" disabled>Meal type</option>
                         {% for meal_type in meal_types %}
                             {% if meal_type.meal_type == recipe.meal_type %}
@@ -27,11 +27,10 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="meal_types">Meal type</label>
                 </div>
                 <!--Difficulty-->
                 <div class="input-field col s12 m4">
-                    <select id="difficulties" name="difficulties" class="validate" required>
+                    <select id="difficulties" name="difficulties" class="browser-default" required>
                         <option value="" disabled>Difficulty</option>
                         {% for difficulty in difficulties %}
                             {% if difficulty.difficulty  == recipe.difficulty %}
@@ -41,11 +40,10 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="difficulties">Difficulty</label>
                 </div>
                 <!--Prep time-->
                 <div class="input-field col s12 m4">
-                    <select id="prep_times" name="prep_times" class="validate" required>
+                    <select id="prep_times" name="prep_times" class="browser-default" required>
                         <option value="" disabled>Prep time</option>
                         {% for prep_time in prep_times %}
                             {% if prep_time.prep_time == recipe.prep_time %}
@@ -55,14 +53,13 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="prep_times">Prep time</label>
                 </div>
             </div>
 
             <div class="row small-margin">
                 <!--Calories-->
                 <div class="input-field col s12 m4">
-                    <select id="calories" name="calories" class="validate" required>
+                    <select id="calories" name="calories" class="browser-default" required>
                         <option value="" disabled>Calories</option>
                         {% for calorie_amount in calories %}
                             {% if calorie_amount.calorie_amount == recipe.calorie_amount %}
@@ -72,7 +69,6 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="calories">Calories</label>
                 </div>
                 <!--Dietary requirements-->
                 <div class="input-field col s12 m4">
@@ -86,7 +82,6 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="dietary_requirements">Dietary requirements</label>
                 </div>
                 <!--Allergens-->
                 <div class="input-field col s12 m4">
@@ -100,14 +95,13 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="allergens">Allergens</label>
                 </div>
             </div>
 
             <div class="row">
                 <!--Servings-->
                 <div class="input-field col s12 m4">
-                    <select id="servings" name="servings" class="validate" required>
+                    <select id="servings" name="servings" class="browser-default" required>
                         <option value="" disabled>Serving</option>
                         {% for serving in servings %}
                             {% if serving.serving == recipe.serving %}
@@ -117,7 +111,6 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <label for="servings">Servings</label>
                 </div>
                 <!--Country-->
                 <div class="input-field col s6 m4">
@@ -169,7 +162,7 @@
                         </div>
                     <!--Ingredient unit-->
                         <div class="input-field col s12 m4">
-                            <select id="unit" name="unit" class="browser-default unit-select" required>
+                            <select id="unit" name="unit" class="browser-default" required>
                                 <option value="" disabled>Unit</option>
                                 <option value="{{ ingredient.unit }}" selected>{{ ingredient.unit }}</option>
                                 <option value="Ml">Ml</option>
@@ -181,7 +174,6 @@
                                 <option value="Pinch">Pinch</option>
                                 <option value="None">None</option>
                             </select>
-                            <label for="unit"></label>
                         </div>  
                     </div>
                 {% endfor %}
