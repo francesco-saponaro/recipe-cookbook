@@ -1,5 +1,5 @@
 //Get form's like button
-const likesButtons = document.querySelectorAll('.like-btn');
+let likesButtons = document.querySelectorAll('.like-btn');
 
 //Change Icon class and input value on click
 likesButtons.forEach(likeButton => {
@@ -14,8 +14,8 @@ likesButtons.forEach(likeButton => {
             e.target.classList.add('far');
             e.target.previousElementSibling.value = false;
         }
-    })
-})
+    });
+});
 
 
 

@@ -7,6 +7,8 @@ function removeIng() {
     //ingredientsContainer.childNodes actually has one extra text field. For that reason we need to increment the number in the condition of while loop.
     if (ingredientsContainer.childNodes.length > 2) {
         ingredientsContainer.removeChild(ingredientsContainer.lastChild);
+    } else {
+        alert("The recipe needs to have minimum 1 ingredient");
     }
 }
 
@@ -41,7 +43,7 @@ function addIng() {
                     <option value="Pinch">Pinch</option>
                     <option value="None">None</option>
                 </select>
-                <label for="Unit"></label>`
+                <label for="Unit"></label>`;
 
         //Append columns to row
         newRow.appendChild(newIngredient);
