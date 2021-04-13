@@ -32,6 +32,11 @@ h4 {
     margin-top:60px;
 }
 
+.flash-margin {
+    margin-right:15px;
+    margin-left:15px;
+}
+
 .underline {
     text-decoration: underline;
 }
@@ -419,6 +424,10 @@ h3 span {
 .meal-type-header {
     margin: 20px 0 40px 0;
 }
+
+.quick-title {
+        margin-right:20px;
+    }
 
 /* Recipes by country */
 .country-margin {

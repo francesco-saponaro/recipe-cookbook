@@ -4,7 +4,6 @@ let likesButtons = document.querySelectorAll('.like-btn');
 //Change Icon class and input value on click
 likesButtons.forEach(likeButton => {
     likeButton.addEventListener('click', e => {
-        console.log(e);
         if (e.target.classList.contains('far')) {
             e.target.classList.remove('far');
             e.target.classList.add('fas');

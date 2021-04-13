@@ -23,10 +23,6 @@
     <div class="row no-top-margin">
         <div class="col s12 m10 offset-m1 flex-col">
             {{ pagination.info }}
-            {% if session.user_session %}
-                <!--url_for will call the specified function's url which in turn will call the function-->
-                <a href="{{ url_for('add_recipe') }}" class="add-filter-btn waves-effect waves-light btn-large right"><span class="add-filter-title">Add recipe</span> <i class="fas fa-plus"></i></a>
-            {% endif %}
         </div>
     </div>
 
@@ -107,7 +103,7 @@
         </div>
 
     {% else %}
-        <h3 class="red-text text-darken-4 center-align">No Results Found</h3>
+        <h3 class="red-text text-darken-4 center-align bottom-margin">No Results Found</h3>
     {% endif %}
         
 {% endblock %}
