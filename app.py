@@ -112,13 +112,13 @@ def filter_results():
 
     # If a recipe name has been added in the search query
     # add it to the final results object.
-    query = request.args.get("recipe_name")
+    query = request.args.get("recipe_name").lower()
     if query:    
         final_results.update({"$text": {"$search": query}})
 
     # If an ingredient name has been added in the search query
     # add it to the final results object.
-    ingredient = request.args.get("ingredient_name")
+    ingredient = request.args.get("ingredient_name").lower()
     if ingredient:    
         final_results.update({'ingredient.ingredient_name': 
                              {"$regex" : ".*" + ingredient + ".*"}})
