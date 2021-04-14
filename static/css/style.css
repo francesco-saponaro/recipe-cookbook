@@ -71,9 +71,13 @@ body {
     margin-bottom:100px;
 }
 
+.row .col.no-padding-left {
+    padding-left:0;
+}
+
 .flex-col {
     display:flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
 }
 

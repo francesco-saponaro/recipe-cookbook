@@ -8,7 +8,11 @@ function removeIng() {
     if (ingredientsContainer.childNodes.length > 2) {
         ingredientsContainer.removeChild(ingredientsContainer.lastChild);
     } else {
-        alert("The recipe needs to have minimum 1 ingredient");
+        //Alert box from the Sweet alert library
+        swal({title:"The recipe must have at least 1 ingredient", 
+              text:"", 
+              icon:"warning"
+        });
     }
 }
 

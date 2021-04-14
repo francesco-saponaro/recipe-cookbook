@@ -83,19 +83,27 @@
             <!--Dietary requirements-->
             <div class="input-field col s12 m4">
                 <h5>Dietary requirements:</h5>
-                <ul class="recipe-ul"> 
-                {% for dietary_requirement in recipe.dietary_requirement %}
-                    <li class="recipe-li"><h6>{{ dietary_requirement }}</h6></li>
-                {% endfor %}
+                <ul class="recipe-ul">
+                {% if recipe.dietary_requirement %}
+                    {% for dietary_requirement in recipe.dietary_requirement %}
+                        <li class="recipe-li"><h6>{{ dietary_requirement }}</h6></li>
+                    {% endfor %}
+                {% else %}
+                    <li class="recipe-li"><h6>None</h6></li>
+                {% endif %}
                 </ul>
             </div>
             <!--Allergens-->
             <div class="input-field col s12 m4">
                 <h5>Allergens:</h5>
                 <ul class="recipe-ul">
-                {% for allergen in recipe.allergen %}
-                    <li class="recipe-li"><h6>{{ allergen }}</h6></li>
-                {% endfor %}
+                {% if recipe.allergen %}
+                    {% for allergen in recipe.allergen %}
+                        <li class="recipe-li"><h6>{{ allergen }}</h6></li>
+                    {% endfor %}
+                {% else %}
+                    <li class="recipe-li"><h6>None</h6></li>
+                {% endif %}
                 </ul>
             </div>
         </div>

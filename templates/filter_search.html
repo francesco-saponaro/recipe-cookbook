@@ -8,7 +8,7 @@
         <form class="col s12" method="GET" action="{{ url_for('filter_results') }}">
             <div class="row small-margin">
                 <div class="col s12 center-align">
-                    <h5 class="main-color">Search by Recipe name or Ingredient <em>(optional)</em></h5>
+                    <h5 class="main-color">Search by Recipe name or Ingredient <small><em>(Optional)</em></small></h5>
                 </div>
             </div>
 
@@ -29,7 +29,7 @@
 
             <div class="row small-margin">
                 <div class="col s12 center-align">
-                    <h5 class="main-color">Apply filters <em>(optional)</em></h5>
+                    <h5 class="main-color">Apply filters <small><em>(Optional)</em></small></h5>
                 </div>
             </div>
 
@@ -87,8 +87,8 @@
                     </select>
                 </div>
                 <!--High protein checkbox-->
-                <div class="input-field col s12 m4">
-                    <p>
+                <div class="input-field col s12 m4 no-padding-left">
+                    <p class="center-align">
                     <label>
                         <input type="checkbox" id="is_high_protein" name="is_high_protein" />
                         <span class="black-color">High protein</span>

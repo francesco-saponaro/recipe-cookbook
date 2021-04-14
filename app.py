@@ -57,15 +57,12 @@ def get_recipes():
 @app.route("/filter_search", methods=['GET','POST'])
 def filter_search():
     # Grab collections from DB in order to populate filter fields
-    # Grab allergens and dietary requirements apart from the "None" documents
-    # as we dont want the user to filter by the "None" option.
     meal_types = mongo.db.meal_types.find()
     difficulties = mongo.db.difficulties.find()
     prep_times = mongo.db.prep_times.find()
     calories = mongo.db.calories.find()
-    dietary_requirements = mongo.db.dietary_requirements.find({"dietary_requirement": 
-                                                              {"$nin": ["None"]}})
-    allergens = mongo.db.allergens.find({"allergen": {"$nin": ["None"]}})
+    dietary_requirements = mongo.db.dietary_requirements.find()
+    allergens = mongo.db.allergens.find()
     countries = mongo.db.countries.find().sort("country", 1)
 
     return render_template("filter_search.html", meal_types=meal_types, difficulties=difficulties, 
@@ -343,14 +340,12 @@ def register():
 
         # This acts as the else statement.
         # Else add form details inside the register dictionary
-        # along with two empty lists needed to store the ID of a liked recipe
-        # and comments added.
+        # along with an empty lists needed to store the ID of a liked recipe.
         # Password is hashed
         register = {
             "username": request.form.get("username").lower(),
             "password": generate_password_hash(request.form.get("password")),
-            "liked_recipe": [],
-            "user_comments": []
+            "liked_recipe": []
         }
 
         # Insert the dictionary in the "users" collection.
