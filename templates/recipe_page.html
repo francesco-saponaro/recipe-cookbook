@@ -187,15 +187,22 @@
     {% endif %}
     {% for comment in comments %}
         {% if comment.recipe_id == recipe._id %}
-            <div class="row form-container recipe-container bottom-margin main-background">
-                <div class="col s12">
-                    <p class="no-bottom-margin no-top-margin white-text">{{ comment.comment }} - <em>by:</em> {{ comment.user }}
-                    {% if comment.user == username %}
-                        <a href="{{ url_for('delete_comment', recipe_id=recipe._id, comment_id=comment._id) }}" class="modal-close waves-effect waves-green btn-small right red">Delete</a>
-                    {% endif %}
-                    </p>
+            {% if comment.user == username %}
+                <div class="row form-container recipe-container bottom-margin main-background valign-wrapper">
+                    <div class="col s10 m11">
+                        <p class="no-bottom-margin no-top-margin white-text">{{ comment.comment }} - <em>by:</em> <span class="bold">{{ comment.user }}</span></p>
+                    </div>
+                    <div class="col s2 m1">
+                        <a href="{{ url_for('delete_comment', recipe_id=recipe._id, comment_id=comment._id) }}" class="btn-floating waves-effect waves-light red right"><i class="fas fa-times"></i></a>
+                    </div>     
                 </div>
-            </div>
+            {% else %}
+                <div class="row form-container recipe-container bottom-margin main-background">
+                    <div class="col s12">
+                        <p class="no-bottom-margin no-top-margin white-text">{{ comment.comment }} - <em>by:</em> <span class="bold">{{ comment.user }}</span></p>
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
     {% endfor %}
     
