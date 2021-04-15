@@ -425,6 +425,7 @@ select:focus {
 
 .recipe-ul {
     text-align: -webkit-center;
+    text-align: -moz-center;
 }
 
 ul:not(.browser-default)>.recipe-li {
