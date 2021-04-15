@@ -430,6 +430,7 @@ select:focus {
 ul:not(.browser-default)>.recipe-li {
     list-style-type: disc;
     width: fit-content;
+    width: -moz-fit-content;
 }
 
 h3 span {

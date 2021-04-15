@@ -39,22 +39,24 @@ def get_recipes():
     # the length of whole recipe collection and the record name which,
     # should be the name of whatever items are being paginated
     pagination = Pagination(page=page, total=recipes.count(),
-                            record_name='recipes')                       
+                            record_name='recipes')
 
     # Check if the user is logged in by checking if a session (cookie)
     # has been created for it.
     if "user_session" in session:
         # Grab session user's id to check if he has liked the recipe
-        session_user = mongo.db.users.find_one({"username": session["user_session"]})
+        session_user = mongo.db.users.find_one({"username":
+                                                session["user_session"]})
         session_user_id = str(session_user["_id"])
 
-        return render_template("index.html", recipe_page=recipe_page, pagination=pagination, 
-                                session_user_id=session_user_id)
+        return render_template("index.html", recipe_page=recipe_page,
+        pagination=pagination, session_user_id=session_user_id)
     else:
-        return render_template("index.html", recipe_page=recipe_page, pagination=pagination)
+        return render_template("index.html", recipe_page=recipe_page,
+        pagination=pagination)
 
 
-@app.route("/filter_search", methods=['GET','POST'])
+@app.route("/filter_search", methods=['GET', 'POST'])
 def filter_search():
     # Grab collections from DB in order to populate filter fields
     meal_types = mongo.db.meal_types.find()
@@ -65,20 +67,21 @@ def filter_search():
     allergens = mongo.db.allergens.find()
     countries = mongo.db.countries.find().sort("country", 1)
 
-    return render_template("filter_search.html", meal_types=meal_types, difficulties=difficulties, 
-    prep_times=prep_times, calories=calories, dietary_requirements=dietary_requirements,
-    allergens=allergens, countries=countries)
+    return render_template("filter_search.html", meal_types=meal_types,
+    difficulties=difficulties, prep_times=prep_times, calories=calories,
+    dietary_requirements=dietary_requirements, allergens=allergens,
+    countries=countries)
 
 
-@app.route("/filter_results", methods=['GET','POST'])
+@app.route("/filter_results", methods=['GET', 'POST'])
 def filter_results():
-    # Get values from filter form aside from allergens and 
+    # Get values from filter form aside from allergens and
     # dietary requirements which have a multiple option.
     # Get value from the search query form, search index has been set up
-    # on the recipes collection to only find recipes by name or ingredients. 
-    # You need to use method="GET" on the form so the form passes the query 
-    # into the args, and then in the route, use request.args.get("query") and 
-    # not request.form.get - so the query is gotten from the args, 
+    # on the recipes collection to only find recipes by name or ingredients.
+    # You need to use method="GET" on the form so the form passes the query
+    # into the args, and then in the route, use request.args.get("query") and
+    # not request.form.get - so the query is gotten from the args,
     # and is kept when you browse pages.
     recipe = {
         "meal_type": request.args.get("meal_types"),
@@ -721,7 +724,7 @@ def delete_recipe(recipe_id):
     mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
     for i in comment:
         mongo.db.comments.remove(i)
-    # Remove deleted recipe from users likes and comments fields, if any
+    # Remove deleted recipe from users likes field, if any
     mongo.db.users.update_many({},
                                {"$pull": {"liked_recipe": ObjectId(recipe_id)}})
 
