@@ -187,40 +187,23 @@ Pagination is available on all pages displaying more than 10 recipes. "Amount of
 * I tried to sort recipes by User likes descending, however, I found that after liking a recipe, pagination would render the wrong recipes, removing some from the page and duplicating others. I tried to find out why with the assistance of a tutor but unfortunately we couldn't fix it. I therefore decided to display recipes in no particular order which fixed the issue
 * When displaying filtered results, the "recipe name" filter info will display with a colon punctuation ":" prior to the name. I have managed to remove all other unnecessary syntax from the results with the "replace" method, however, I don't seem to be able to target this particular colon 
 * When adding a comment, the comment does not immediately show in the comments section below. It will only show once leaving the page and reloading it 
+* Fixed Firefox Unordered list aligning issue by adding -moz-fit-content to the width property and -moz-center to the text-align property
 
 ## Deployment 
-This project was developed using Gitpod, committed to Github and pushed to Github using the built in function.
+This project was developed using Gitpod, a [Github repository](https://github.com/francesc-droid/recipe-cookbook) was created and regular commits were pushed to the repository through Git commands
 
-To deploy this page to Github Pages from it's [Github repository](https://github.com/francesc-droid/ramen-locator), the following steps were taken:
-1. Log into Github.
-2. From the list of repositories on the screen, select "ramen-locator".
-3. From the menu items near the top of the page, select "Settings".
-4. Scroll down to the Github pages section.
-5. Under "Source" click the drop down menu labelled "None" and select "Main" branch.
-6. Click "Save" and the website is now deployed.
-7. Above "Source" you will find the link to the deployed website.
+The project was deployed to [Heroku](https://www.heroku.com/) using the following steps:
+* Set environment variables and made sure they were in the gitignore file and not being tracked 
+* Created requirements.txt for dependencies and Procfile to tell which file is required to run the app: pip3 freeze --local requirements.txt echo web: python app.py > Procfile. I made sure you remove the blank line from the Procfile as it might cause problems when running the app on Heroku
+* Created new Heroku app from the Heroku website by clicking "Create new app"
+* Connected my app from my Github repository by clicking on the Github icon in my app's "Deploy" section, then clicked "Search" and once it found my repo I clicked "connect" 
+* Before I clicked "Enable automatic deployment" I needed to tell Heroku which hidden environment variables were required (the ones hidden in the env.py file), so I clicked on the "Settings" tab and then on "Reveal config vars" and added all required hidden variables
+* Went back to "Deploy" tab, clicked on "Enable automatic deployment" and then directly below it clicked on "Deploy branch"
+Heroku will now receive the code from Github and start building the app using the required packages
+* After a minute or so the message "Your app was successfully deployed" appeared, I then clicked on the "View" button below that message to launch my app
+* The deployed site was now available and automatically updated whenever I pushed changes to the Github repository
 
-### How to run this project locally
-To clone this project into Gitpod you will need:
-1. A Github account. Create a Github account [here](https://github.com/).
-2. Use the Chrome browser.
-
-Then follow these steps:
-1. Install the Gitpod browser extension for Chrome.
-2. After installation restart the browser.
-3. Log into Github with your Github account.
-4. Navigate to the project Github repository.
-5. Click the green "Gitpod" button.
-6. This will trigger a new Gitpod workspace to be created from the code in Github where you can work locally.
-
-To work on the project code within a local IDE such as VSCode etc.
-1. Follow this link to the [Project Github repository](https://github.com/francesc-droid/ramen-locator).
-2. Under the repository name, click "Code" and then "Clone" or "Download ZIP".
-3. In the "Clone with the HTTPs" section, copy the clone URL for the repository.
-4. In your local IDE, open the terminal.
-5. Change the current working directory to the location where you want the directory to be cloned.
-6. Type "git clone",  and then paste the URL you copied in step 3.
-7. Press "Enter" and your local clone will be created.
+* My deployed website can be found [here](https://recipe-cookbook-fran.herokuapp.com/).
 
 ## Credits
 ### Code
@@ -237,5 +220,6 @@ To work on the project code within a local IDE such as VSCode etc.
 * All recipes images were taken from [BBC Good Food](https://www.bbcgoodfood.com/)
 #### Icons
 * All icons were taken from [Font Awesome](https://fontawesome.com/)
+* Favicon icon was taken from <a href="https://www.flaticon.com/authors/flat-icons" title="Flat Icons">Flat icon</a>
 
 
