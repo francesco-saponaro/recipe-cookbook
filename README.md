@@ -68,7 +68,7 @@ Due to the large variety of users and their age group, the overall feel of the w
 * The recipe images were chosen based on their definition and ability to portray the dish. However, users are able to chose whichever image suit their taste. If an image is not uploaded, a placeholder image is loaded instead, informing users that no image is available.
 
 ## Wireframes
-[Link to Wireframes](//francesc-droid.github.io//recipe-cookbook/wireframes/recipe-cookbook-wireframe.pdf).
+[Link to Wireframes](//francesc-droid.github.io/workspace/recipe-cookbook/wireframes/recipe-cookbook-wireframe.pdf).
 
 ## Database schema
 The MongoDB database contains 13 collections:
