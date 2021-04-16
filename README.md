@@ -24,6 +24,7 @@ Enjoy :)
     * Dietary requirements
     * Allergens
     * High protein
+* I want to do a quick search for a recipe, to find inspiration for a meal when I am short of time.
 * I want to see the available stats, to see what users are most interested in.
 * I want to register and log in to add, edit and delete my own recipes.
 * I want to register and log in to like and unlike another user's recipe, to connect with the community and to add the recipe on my favourites bookmarked recipes section in my profile page.
@@ -42,6 +43,7 @@ Enjoy :)
     * Dietary requirements
     * Allergens
     * High protein
+* I want to log in to do a quick search for a recipe, to find inspiration for a meal when I am short of time.
 * I want to see the available stats, to see what users are most interested in or who is most active.
 * I want to log in to see which recipes are most liked or commented.
 * I want to log in to add, edit and delete my own recipes.
@@ -172,7 +174,66 @@ The MongoDB database contains 13 collections:
     * Only errors are shown on the dashboard HTML page script as Jinja template syntax is used in the Javascript code to pass data into the AmCharts function.
     * No errors on JSHint otherwise.
 ### Client stories testing
-
+The website flow is designed so that every page available to the user is accessible through the Navbar or slider menu, which interchange depending on screen size. The "Register" and "Log in" links interchange with the "Profile" and "Log out" links depending on if the user is logged in or not.
+Defensive programming was implemented to:
+* Make sure logged in or logged out users are not able to access other user`s accounts and pages by pasting their URL. On trying to do so they will be redirected to the Home page.
+* Make sure users dont log in without authentication by pasting the right URL. On trying to do so they will be redirected to the Home page.
+* In the case of a 404 or 500 error the user will be redirected to a page informing him of the error and with a link to go back to the Home page.
+#### As a user i want:
+* I want to browse through all recipes, to find inspiration for a meal.
+    * As soon as the user land in the home page he will see all available recipes displayed in panels and paginated.
+    * By clicking on the desired recipe he will be redirected to the recipe page.  
+* I want to browse recipes by:
+    * Recipe name
+    * Ingredient
+    * Meal type
+    * Difficulty
+    * Prep time
+    * Calories
+    * Country
+    * Dietary requirements
+    * Allergens
+    * High protein
+        * By clicking the "search" button on the top left of the page, selecting your parameters and clickin the "apply" button.
+        * The "search" button is available on every page but the "profile" and "dashboard" pages.
+* I want to log in to do a quick search for a recipe, to find inspiration for a meal when I am short of time.
+    * The "Quick search" dropdown menu page is located in the Navbar or Side menu depending on screen sizes.
+* I want to see the available stats, to see what users are most interested in or who is most active.
+    * The "Dashboard" page link is located in the Navbar or Side menu depending on screen sizes.
+* I want to register to add, edit and delete my own recipes.
+    * The "Register" page link is available whenever logged out and located in the Navbar or Side menu depending on screen sizes.
+* I want to log in to add, edit or delete a recipe.
+    * The "Log in" page link is available whenever logged out and located in the Navbar or Side menu depending on screen sizes.
+* I want to log in to add a recipe.
+    * The "Add recipe" page button is located on the right side of the screen and available on all pages but the "Dashboard" page, whenever logged in.
+    * By clicking on the button, filling the form and clicking the "Add recipe" button.
+* I want to log in to edit my own recipes.
+    * The "Edit recipe" page button is located on each of the user's recipe panel whenever logged in.
+    * By clicking on the button, editing the form and clicking the "Edit recipe" button.
+* I want to log in to delete my own recipes.
+    * The "Delete recipe" button is located on each of the user's recipe panel whenever logged in.
+    * By clicking on the button, and clicking the Modal's "Confirm" button.
+* I want to log in to like and unlike another user's recipe, to connect with the community and to add the recipe on my favourites bookmarked recipes section in my profile page.
+    * The "Like" button is located, in the form of a "Heart" icon, on each recipe panel whenever logged in.
+    * By clicking on the icon the user can like and unlike the recipe, on each click it will be redirected to the current page.
+* I want to log in to access my profile, to see if my recipes have more likes or comments or to go through my favourite recipes for inspiration.
+    * The "Profile" page link is available whenever logged in and located in the Navbar or Side menu depending on screen sizes.
+    * By clicking on the link, and clicking on either the "Your recipes" panel or the "Your favourite recipes" panel.
+* I want to log in to comment on other users recipes, to connect with the community.
+    * The "Comment" link is located on each recipe panel and at the top of each recipe page, whenever logged in.
+    * By clicking on the icon the user is redirected to that recipe page comments section, where it'll be able leave a comment 
+    * The comments section is also accessible by manually going to a recipe page and scrolling to the bottom.
+* I want to log in to see a specific recipe comments
+    * The "Comment" link is located on each recipe panel and at the top of each recipe page, whenever logged in.
+    * By clicking on the icon the user is redirected to that recipe page comments section, where it'll be able to see all comments.
+    * The comments section is also accessible by manually going to a recipe page and scrolling to the bottom.
+* I want to log in to remove a comment I posted.
+    * The "Delete comment" icon is located on the right side of each of the user's comment panel.
+* I want to log in to see which recipes are most liked or commented.
+    * The "Like" and "Comment" counts are located beside their respective icons.
+* I want to log in to see if any users liked my recipes or if any users commented on my recipes and who they were.
+    * The "Profile" page link is available whenever logged in and located in the Navbar or Side menu depending on screen sizes.
+    * By clicking on the link, and clicking on either the "Your recipes" panel or the "Your favourite recipes" panel.
 ### Lighthouse
 * Passed all tests
 * Scores:
@@ -192,6 +253,7 @@ All elements now work as desired.
 * When displaying filtered results, the "recipe name" filter info will display with a colon punctuation ":" prior to the name. I have managed to remove all other unnecessary syntax from the results with the "replace" method, however, I don't seem to be able to target this particular colon.
 * When adding a comment, the comment does not immediately show in the comments section below. It will only show once leaving the page and reloading it.
 * Fixed Firefox Unordered list aligning issue by adding -moz-fit-content to the width property and -moz-center to the text-align property.
+* A few days prior to submitting this projects, upon trying to open the deployed version of the website, the page would throw a "Type Error - None object is not subscriptable". This would only happen if I tried to log in from my laptop, while it worked fine on my phone. I fixed this error by clearing the data on the application storage on the dev tools. Unfortunately, even with the help of a tutor, I wasn't able to find out why this happened.
 
 ## Deployment 
 This project was developed using Gitpod, a [Github repository](https://github.com/francesc-droid/recipe-cookbook) was created and regular commits were pushed to the repository through Git commands.

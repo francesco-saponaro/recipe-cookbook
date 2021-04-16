@@ -45,7 +45,7 @@ def get_recipes():
     # has been created for it.
     if "user_session" in session:
         # Grab session user's id to check if he has liked the recipe
-        session_user = mongo.db.users.find_one({"username":session["user_session"]})
+        session_user = mongo.db.users.find_one({"username": session["user_session"]})
         session_user_id = str(session_user["_id"])
 
         return render_template("index.html", recipe_page=recipe_page,
