@@ -167,12 +167,15 @@ The MongoDB database contains 13 collections:
 ## Testing
 ### Validation
 * HTML
-    * Only errors showing on HTML validator are related to jinja syntax.
+    * Only errors showing on [HTML validator](https://validator.w3.org/) are related to jinja syntax.
 * CSS
-    * No errors shown on Jigsaw validator.
+    * No errors shown on [Jigsaw](https://jigsaw.w3.org/css-validator/) validator.
 * Javascript
     * Only errors are shown on the dashboard HTML page script as Jinja template syntax is used in the Javascript code to pass data into the AmCharts function.
-    * No errors on JSHint otherwise.
+    * No errors on [JSHint](https://jshint.com/) otherwise.
+* Python
+    * No errors shown on [PEP8 online](http://pep8online.com/)
+    * Only warnings, regarding trailing whitespaces
 ### Client stories testing
 The website flow is designed so that every page available to the user is accessible through the Navbar or slider menu, which interchange depending on screen size. The "Register" and "Log in" links interchange with the "Profile" and "Log out" links depending on if the user is logged in or not.  
 Defensive programming was implemented to:
